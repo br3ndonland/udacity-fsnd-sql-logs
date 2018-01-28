@@ -19,10 +19,14 @@ def popular_articles():
     # Create a cursor object to run queries and scan through results
     c = db.cursor()
     # Execute the SQL query using the cursor
-    c.execute()
+    c.execute("""
+        select title, num from
+            (select substr(path, 10), count(*) as num from log
+            where path !='/' group by path)
+        as hits, articles where substr = slug order by num desc limit 3;
+        """)
     # Fetch all results from the cursor object
-    articles = c.fetchall()
-    print(articles)
+    return c.fetchall()
     # Close connection
     db.close()
     pass
@@ -38,29 +42,36 @@ def popular_authors():
     # Create a cursor object to run queries and scan through results
     c = db.cursor()
     # Execute the SQL query using the cursor
-    c.execute()
+    c.execute("""
+        select name, sum(views) as total_views from
+            (select name, author, title, views from
+                (select substr(path, 10), count(*) as views from log
+                    where path !='/' group by path)
+                as hits, articles, authors
+                where substr = slug and author = authors.id
+                order by views desc)
+            as threetables group by name order by total_views desc;
+        """)
     # Fetch all results from the cursor object
-    authors = c.fetchall()
-    print(articles)
+    return c.fetchall()
     # Close connection
     db.close()
     pass
 
 
-# 3. Days on which >1% of HTTP requests led to errors
-def errors():
-    """Returns a list of days on which >1% of HTTP requests resulted in
-    HTTP error codes.
-    """
-    # Connect to database
-    db = psycopg2.connect(database=DBNAME)
-    # Create a cursor object to run queries and scan through results
-    c = db.cursor()
-    # Execute the SQL query using the cursor
-    c.execute()
-    # Fetch all results from the cursor object
-    errors = c.fetchall()
-    print(articles)
-    # Close connection
-    db.close()
-    pass
+# # 3. Days on which >1% of HTTP requests led to errors
+# def errors():
+#     """Returns a list of days on which >1% of HTTP requests resulted in
+#     HTTP error codes.
+#     """
+#     # Connect to database
+#     db = psycopg2.connect(database=DBNAME)
+#     # Create a cursor object to run queries and scan through results
+#     c = db.cursor()
+#     # Execute the SQL query using the cursor
+#     c.execute()
+#     # Fetch all results from the cursor object
+#     return c.fetchall()
+#     # Close connection
+#     db.close()
+#     pass
