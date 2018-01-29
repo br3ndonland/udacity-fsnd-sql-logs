@@ -18,6 +18,9 @@ br3ndonland
 - [Starting Python in *logs.py*](#starting-python-in-logspy)
 - [Starting the virtual machine and exploring the data](#starting-the-virtual-machine-and-exploring-the-data)
 - [SQL queries](#sql-queries)
+  - [1. What are the most popular three articles of all time?](#1-what-are-the-most-popular-three-articles-of-all-time)
+  - [2. Who are the most popular article authors of all time?](#2-who-are-the-most-popular-article-authors-of-all-time)
+  - [3. On which days did more than one percent of requests lead to errors?](#3-on-which-days-did-more-than-one-percent-of-requests-lead-to-errors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -208,6 +211,7 @@ I broke each query down, as recommended in the Udacity instructions, and repeate
 
 
 ### 1. What are the most popular three articles of all time?
+[(back to top)](#top)
 
 #### Use the `log` table to count hits by `path`
 
@@ -265,9 +269,9 @@ news=> select path, count(*) as num from log where path !='/' group by path orde
 ```
 
 
-#### Join the log table with the articles table
+#### Convert `path` in `log` to match `slug` in `articles`
 
-Now to merge the log with the articles table. 
+Let's review the two tables we're trying to join:
 
 ```sql
 news=> select id, slug, title from articles;
@@ -343,12 +347,14 @@ news=> select substr(path, 10), count(*) as num from log where path !='/' group 
 (3 rows)
 ```
 
+**Yes!**
 
-#### Combine the hit count and join into a single SQL statement
 
-Now time to write the join! I started off just drafting it in plain English.
+#### Combine the hit count and the join of `log` and `articles` into a single SQL statement
 
-I want to join the `log` table with the `articles` table, where the `substr` from `log` matches the `slug` from `articles`, and show the `title` column from `articles` with the `num` count column created by the aggregation in `log`.
+Now time to write the full query! I started off just drafting it in plain English:
+
+> I want to join the `log` table with the `articles` table, where the `substr` from `log` matches the `slug` from `articles`, and show the `title` column from `articles` with the `num` count column created by the aggregation in `log`.
 
 Wow, alright. Let's break that down:
 
@@ -386,7 +392,7 @@ select num from (select substr(path, 10), count(*) as num from log where path !=
 (3 rows)
 ```
 
-Next, I continued iterating to get my first successful join of `log` and `articles`:
+Next, I continued iterating to get my first join of `log` and `articles`:
 
 ```sql
 news=> select title, num from (select substr(path, 10), count(*) as num from log where path !='/' group by path order by num desc limit 3) as hits, articles limit 3;
@@ -465,6 +471,7 @@ I will need to reformat the output into a plain-text table like PostgreSQL. I tr
 
 
 ### 2. Who are the most popular article authors of all time?
+[(back to top)](#top)
 
 The second query is like an extension of the first, with an additional join to the authors table, and an aggregation to group the articles by author.
 
@@ -634,12 +641,476 @@ vagrant@vagrant:/vagrant/logs$ python -c 'import logs; print(logs.popular_articl
 
 Git commit at this point: 
 
-"Complete queries one and two"
+"Complete SQL queries one and two"
 
 
-### 3. On which days did more than 1% of requests lead to errors?
+### 3. On which days did more than one percent of requests lead to errors?
+[(back to top)](#top)
 
-I will need to sum the total number of HTTP requests, and divide by the number of HTTP error codes like 404.
+I need to sum the total number of HTTP requests, and divide by the number of HTTP `404` error codes.
+
+I started by reviewing the contents of the `log` table:
+
+```
+\d log
+```
+
+```
+                                  Table "public.log"
+ Column |           Type           |                    Modifiers
+--------+--------------------------+--------------------------------------------------
+ path   | text                     |
+ ip     | inet                     |
+ method | text                     |
+ status | text                     |
+ time   | timestamp with time zone | default now()
+ id     | integer                  | not null default nextval('log_id_seq'::regclass)
+Indexes:
+    "log_pkey" PRIMARY KEY, btree (id)
+```
+
+A quick view of the `status` column in the `log` table shows two status codes, `200 OK` and `404 NOT FOUND`:
+
+```sql
+news=> select status from log group by status;
+```
+
+```
+    status
+---------------
+ 404 NOT FOUND
+ 200 OK
+(2 rows)
+```
+
+Each HTTP request returns a `status` and `time`:
+
+```sql
+news=> select status, time from log limit 5;
+```
+
+```
+ status |          time
+--------+------------------------
+ 200 OK | 2016-07-01 07:00:00+00
+ 200 OK | 2016-07-01 07:00:47+00
+ 200 OK | 2016-07-01 07:00:34+00
+ 200 OK | 2016-07-01 07:00:52+00
+ 200 OK | 2016-07-01 07:00:23+00
+(5 rows)
+```
+
+
+#### Group requests by day
+
+The `time` column contains more than just the date. I will have to slice out the time.
+
+I took a look at the PostgreSQL documentation, and quickly found the entry for [`EXTRACT, date_part`](https://www.postgresql.org/docs/9.5/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT). After reading through and trying it out, I actually found that [`date_trunc`](https://www.postgresql.org/docs/9.5/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC) was more appropriate. It sets the time of day to zero, while keeping the date the same:
+
+```sql
+select date_trunc('day', time) as date, status from log limit 5;
+```
+
+```
+          date          | status
+------------------------+--------
+ 2016-07-01 00:00:00+00 | 200 OK
+ 2016-07-01 00:00:00+00 | 200 OK
+ 2016-07-01 00:00:00+00 | 200 OK
+ 2016-07-01 00:00:00+00 | 200 OK
+ 2016-07-01 00:00:00+00 | 200 OK
+(5 rows)
+```
+
+I tried slicing out the time completely with a substring command.
+
+```sql
+news=> select substr(date_trunc('day', time), 1, 10) as date from log limit 5;
+```
+
+I couldn't get it to work initially, but I will return to this later if needed.
+
+I was able to group the entries by date, revealing that the table was logging HTTP requests in July 2016:
+
+```sql
+select date_trunc('day', time) as date from log group by date;
+```
+
+```
+          date
+------------------------
+ 2016-07-01 00:00:00+00
+ 2016-07-02 00:00:00+00
+ 2016-07-03 00:00:00+00
+ 2016-07-04 00:00:00+00
+ 2016-07-05 00:00:00+00
+ 2016-07-06 00:00:00+00
+ 2016-07-07 00:00:00+00
+ 2016-07-08 00:00:00+00
+ 2016-07-09 00:00:00+00
+ 2016-07-10 00:00:00+00
+ 2016-07-04 00:00:00+00
+ 2016-07-05 00:00:00+00
+ 2016-07-06 00:00:00+00
+ 2016-07-07 00:00:00+00
+ 2016-07-08 00:00:00+00
+ 2016-07-09 00:00:00+00
+ 2016-07-10 00:00:00+00
+ 2016-07-11 00:00:00+00
+ 2016-07-12 00:00:00+00
+ 2016-07-13 00:00:00+00
+ 2016-07-14 00:00:00+00
+ 2016-07-15 00:00:00+00
+ 2016-07-16 00:00:00+00
+ 2016-07-17 00:00:00+00
+ 2016-07-18 00:00:00+00
+ 2016-07-19 00:00:00+00
+ 2016-07-20 00:00:00+00
+ 2016-07-21 00:00:00+00
+ 2016-07-22 00:00:00+00
+ 2016-07-23 00:00:00+00
+ 2016-07-24 00:00:00+00
+ 2016-07-25 00:00:00+00
+ 2016-07-26 00:00:00+00
+```
+
+
+#### Count the number of HTTP requests per day
+
+One of my query attempts actually hung the virtual machine. I think it was including `from log` at the top level of the query.
+
+I logged in with a separate terminal window and used the `top` command to troubleshoot.
+
+```
+/vagrant$ psql -d news
+psql (9.5.10)
+Type "help" for help.
+```
+
+```sql
+news=> select date, status, http_requests from log,
+(select date_trunc('day', time) as date from log) as datemod,
+(select count(*) as http_requests from log) as requests
+ order by date limit 10;
+```
+
+In a separate terminal window:
+
+```bash
+$ vagrant ssh
+vagrant@vagrant:~$ top
+```
+
+```
+top - 13:12:30 up 15:05,  2 users,  load average: 0.97, 0.50, 0.20
+Tasks: 110 total,   2 running, 108 sleeping,   0 stopped,   0 zombie
+%Cpu(s): 98.7 us,  1.3 sy,  0.0 ni,  0.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1024012 total,   585268 free,    56496 used,   382248 buff/cache
+KiB Swap:  1048572 total,  1048572 free,        0 used.   798024 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+ 1508 postgres  20   0  202820  18888  12676 R 99.9  1.8   3:18.07 postgres
+  852 message+  20   0    6044   3696   3320 S  0.3  0.4   0:02.86 dbus-daemon
+ 3947 vagrant   20   0   13172   4676   3976 S  0.3  0.5   0:00.04 sshd
+    1 root      20   0    6744   5168   3820 S  0.0  0.5   0:01.87 systemd
+    2 root      20   0       0      0      0 S  0.0  0.0   0:00.00 kthreadd
+    3 root      20   0       0      0      0 S  0.0  0.0   0:00.11 ksoftirqd/0
+    5 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 kworker/0:0H
+    7 root      20   0       0      0      0 S  0.0  0.0   0:01.04 rcu_sched
+    8 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcu_bh
+    9 root      rt   0       0      0      0 S  0.0  0.0   0:00.00 migration/0
+   10 root      rt   0       0      0      0 S  0.0  0.0   0:00.62 watchdog/0
+   11 root      20   0       0      0      0 S  0.0  0.0   0:00.00 kdevtmpfs
+   12 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 netns
+   13 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 perf
+   14 root      20   0       0      0      0 S  0.0  0.0   0:00.01 khungtaskd
+   15 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 writeback
+   16 root      25   5       0      0      0 S  0.0  0.0   0:00.00 ksmd
+```
+
+I actually couldn't kill the process.
+
+```bash
+vagrant@vagrant:~$ kill -9 1508
+```
+
+```
+-bash: kill: (1508) - Operation not permitted
+```
+
+Typing `logout` doesn't do anything, because I don't have a command prompt. Quitting my terminal program (iTerm2) reveals a process still running in VirtualBox. I sent an ACPI shutdown signal through the GUI (can also be done on command line with `VBoxManage controlvm Ubuntu acpipowerbutton`).
+
+Okay, time to try again.
+
+I started building the query, piece by piece.
+
+This at least runs and establishes the count syntax:
+
+```sql
+select count(*) as http_requests from log group by time limit 5;
+```
+
+Now to build in the date truncation:
+
+```sql
+select date_trunc('day', time) as date, count(*) as http_requests from log group by date order by date desc;
+```
+
+```
+          date          | http_requests
+------------------------+---------------
+ 2016-07-31 00:00:00+00 |         45845
+ 2016-07-30 00:00:00+00 |         55073
+ 2016-07-29 00:00:00+00 |         54951
+ 2016-07-28 00:00:00+00 |         54797
+ 2016-07-27 00:00:00+00 |         54489
+ 2016-07-26 00:00:00+00 |         54378
+ 2016-07-25 00:00:00+00 |         54613
+ 2016-07-24 00:00:00+00 |         55100
+ 2016-07-23 00:00:00+00 |         54894
+ 2016-07-22 00:00:00+00 |         55206
+ 2016-07-21 00:00:00+00 |         55241
+ 2016-07-20 00:00:00+00 |         54557
+ 2016-07-19 00:00:00+00 |         55341
+ 2016-07-18 00:00:00+00 |         55589
+ 2016-07-17 00:00:00+00 |         55907
+ 2016-07-16 00:00:00+00 |         54498
+ 2016-07-15 00:00:00+00 |         54962
+ 2016-07-14 00:00:00+00 |         55196
+ 2016-07-13 00:00:00+00 |         55180
+ 2016-07-12 00:00:00+00 |         54839
+ 2016-07-11 00:00:00+00 |         54497
+ 2016-07-10 00:00:00+00 |         54489
+ 2016-07-09 00:00:00+00 |         55236
+ 2016-07-08 00:00:00+00 |         55084
+ 2016-07-07 00:00:00+00 |         54740
+ 2016-07-06 00:00:00+00 |         54774
+ 2016-07-05 00:00:00+00 |         54585
+ 2016-07-04 00:00:00+00 |         54903
+ 2016-07-03 00:00:00+00 |         54866
+ 2016-07-02 00:00:00+00 |         55200
+ 2016-07-01 00:00:00+00 |         38705
+(31 rows)
+```
+
+**Alright!**
+
+
+#### Count the number of errors per day
+
+I modified the total HTTP requests query to return the HTTP 404 errors:
+
+```sql
+select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date order by date desc;
+```
+
+```
+          date          | http_404
+------------------------+----------
+ 2016-07-31 00:00:00+00 |      329
+ 2016-07-30 00:00:00+00 |      397
+ 2016-07-29 00:00:00+00 |      382
+ 2016-07-28 00:00:00+00 |      393
+ 2016-07-27 00:00:00+00 |      367
+ 2016-07-26 00:00:00+00 |      396
+ 2016-07-25 00:00:00+00 |      391
+ 2016-07-24 00:00:00+00 |      431
+ 2016-07-23 00:00:00+00 |      373
+ 2016-07-22 00:00:00+00 |      406
+ 2016-07-21 00:00:00+00 |      418
+ 2016-07-20 00:00:00+00 |      383
+ 2016-07-19 00:00:00+00 |      433
+ 2016-07-18 00:00:00+00 |      374
+ 2016-07-17 00:00:00+00 |     1265
+ 2016-07-16 00:00:00+00 |      374
+ 2016-07-15 00:00:00+00 |      408
+ 2016-07-14 00:00:00+00 |      383
+ 2016-07-13 00:00:00+00 |      383
+ 2016-07-12 00:00:00+00 |      373
+```
+
+**Excellent!**
+
+Note the single quotes around `status = '404 NOT FOUND'`. I tried double quotes first, but double quotes make PostgreSQL think `"404 NOT FOUND"` is a column name, and it returns an error.
+
+The two steps above for counting total HTTP requests and errors separately took me ~2-3 hours over Sunday afternoon 20180128 and Monday morning 20180129.
+
+
+#### Combine the counts of total HTTP requests and HTTP 404 errors into a single table
+
+##### Review
+
+Now I need to combine the two queries from above:
+
+```sql
+select date_trunc('day', time) as date, count(*) as http_requests from log group by date order by date desc;
+```
+
+```sql
+select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date order by date desc;
+```
+
+I need to join the two queries on date. This is a similar task to the [first query](#1-what-are-the-most-popular-three-articles-of-all-time), where I joined the `log` and `articles` table based on the `slug` in the URL:
+
+```sql
+news=> select title, views from (select substr(path, 10), count(*) as views from log where path !='/' group by path) as hits, articles where substr = slug order by views desc limit 3;
+```
+
+```
+              title               | views
+----------------------------------+--------
+ Candidate is jerk, alleges rival | 338647
+ Bears love berries, alleges bear | 253801
+ Bad things gone, say good people | 170098
+(3 rows)
+
+```
+
+
+##### Planning
+
+I continued by drafting the task in plain English:
+
+* I want to see a table with three columns: the day, the total number of http requests, and the total number of error requests: `select day, http_requests, http_404`
+* I want to match the http requests and error requests columns based on the date: `where http_requests.date = http_404.date`
+
+It's not possible to combine both queries into a single `select` statement because `where` can be used only once. For example, the query below returns the three columns I want, but both columns display the error request count, because the entire statement is being filtered `where status = '404 NOT FOUND'`:
+
+```sql
+select date_trunc('day', time) as date, count(*) as http_requests, count(*) as http_404 from log where status = '404 NOT FOUND' group by date order by date desc limit 5;
+```
+
+```
+          date          | http_requests | http_404
+------------------------+---------------+----------
+ 2016-07-31 00:00:00+00 |           329 |      329
+ 2016-07-30 00:00:00+00 |           397 |      397
+ 2016-07-29 00:00:00+00 |           382 |      382
+ 2016-07-28 00:00:00+00 |           393 |      393
+ 2016-07-27 00:00:00+00 |           367 |      367
+(5 rows)
+```
+
+
+##### Execution
+
+This task will require subqueries.
+
+I had to repeatedly iterate at this step for about 3 hours. It wasn't too difficult to split the task out into subqueries, but I was throwing errors regarding the aggregation, like `ERROR:  column "log.time" must appear in the GROUP BY clause or be used in an aggregate function`.
+The two keys were:
+
+1. Establishing the proper join condition `where requests.date = errors.date`
+2. Making sure I specified the correct names (like `errors.date` instead of `http_404.date`).
+
+Successful query:
+
+```sql
+select requests.date, http_requests, http_404 from
+(select date_trunc('day', time) as date, count(*) as http_requests from log group by date) as requests,
+(select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date) as errors
+where requests.date = errors.date
+order by requests.date desc;
+```
+
+```
+          date          | http_requests | http_404
+------------------------+---------------+----------
+ 2016-07-31 00:00:00+00 |         45845 |      329
+ 2016-07-30 00:00:00+00 |         55073 |      397
+ 2016-07-29 00:00:00+00 |         54951 |      382
+ 2016-07-28 00:00:00+00 |         54797 |      393
+ 2016-07-27 00:00:00+00 |         54489 |      367
+ 2016-07-26 00:00:00+00 |         54378 |      396
+ 2016-07-25 00:00:00+00 |         54613 |      391
+ 2016-07-24 00:00:00+00 |         55100 |      431
+ 2016-07-23 00:00:00+00 |         54894 |      373
+ 2016-07-22 00:00:00+00 |         55206 |      406
+ 2016-07-21 00:00:00+00 |         55241 |      418
+ 2016-07-20 00:00:00+00 |         54557 |      383
+ 2016-07-19 00:00:00+00 |         55341 |      433
+ 2016-07-18 00:00:00+00 |         55589 |      374
+ 2016-07-17 00:00:00+00 |         55907 |     1265
+ 2016-07-16 00:00:00+00 |         54498 |      374
+ 2016-07-15 00:00:00+00 |         54962 |      408
+ 2016-07-14 00:00:00+00 |         55196 |      383
+ 2016-07-13 00:00:00+00 |         55180 |      383
+ 2016-07-12 00:00:00+00 |         54839 |      373
+ 2016-07-11 00:00:00+00 |         54497 |      403
+ 2016-07-10 00:00:00+00 |         54489 |      371
+ 2016-07-09 00:00:00+00 |         55236 |      410
+ 2016-07-08 00:00:00+00 |         55084 |      418
+ 2016-07-07 00:00:00+00 |         54740 |      360
+ 2016-07-06 00:00:00+00 |         54774 |      420
+ 2016-07-05 00:00:00+00 |         54585 |      423
+ 2016-07-04 00:00:00+00 |         54903 |      380
+ 2016-07-03 00:00:00+00 |         54866 |      401
+ 2016-07-02 00:00:00+00 |         55200 |      389
+ 2016-07-01 00:00:00+00 |         38705 |      274
+(31 rows)
+```
+
+**Awesome!**
+
+
+#### Identify days on which > 1% of requests were errors
+
+Now I basically need to add in another calculation, probably something like `having http_404 > 0.01 * http_requests`. I tried `having` but it was easier to just add `and` to the `where` restriction instead.
+
+```sql
+select requests.date, http_requests, http_404 from
+(select date_trunc('day', time) as date, count(*) as http_requests from log group by date) as requests,
+(select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date) as errors
+where requests.date = errors.date
+and errors.http_404 > 0.01 * requests.http_requests
+order by requests.date desc;
+```
+
+```
+          date          | http_requests | http_404
+------------------------+---------------+----------
+ 2016-07-17 00:00:00+00 |         55907 |     1265
+(1 row)
+```
+
+YES! The query shows one day, July 17, on which more than 1% of queries led to errors.
+
+
+#### Display the error percentage
+
+I tried going a bit further to show the error percentage as a column:
+
+```sql
+select errors.http_404 / requests.http_requests * 100 as error_percentage
+```
+
+It was difficult, because the `http_requests` and `http_404` columns are being created in this query.
+
+Solution? Another subquery!
+
+This runs and displays the `error_percentage` column, but doesn't correctly calculate the percentage:
+
+```sql
+select requests_and_errors.date, http_requests, http_404, (http_404 / http_requests *100) as error_percentage from
+	(select requests.date, http_requests, http_404 from
+	(select date_trunc('day', time) as date, count(*) as http_requests from log group by date) as requests,
+	(select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date) as errors
+	where requests.date = errors.date
+	order by requests.date desc) as requests_and_errors;
+```
+
+I tried nesting the query even further:
+
+```sql
+select requests_and_errors.date, http_requests, http_404, error_percentage from
+	(select http_404 / http_requests * 100 as error_percentage from requests_and_errors) as percentage
+		(select requests.date, http_requests, http_404 from
+			(select date_trunc('day', time) as date, count(*) as http_requests from log group by date) as requests,
+			(select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date) as errors
+			where requests.date = errors.date
+			order by requests.date desc)
+		as requests_and_errors,
+;
+```
 
 
 [(back to top)](#top)
