@@ -32,7 +32,7 @@ br3ndonland
 	- *logs-methods.md* (this file) to log my progress
 	- *logs-udacity.md* to store the project information and rubric from Udacity
 	- *logs.py* for the main program code
-	- *output.txt* to store sample output from the program
+	- *logs-output.txt* to store sample output from the program
 	- *README.md* for a concise description of the project
 * I kept vagrant and the database in a separate directory because of the large size of the database file.
 
@@ -54,7 +54,7 @@ br3ndonland
 	# 3. Days on which >1% of HTTP requests led to errors
 
 	```
-* To function or not to function: Next, I decided to write each of the three queries as a Python function. I began building the functions based on the resources from *Lesson 03. Python DB-API*:
+* *To function or not to function:* Next, I decided to write each of the three queries as a Python function. I began building the functions based on the resources from *Lesson 03. Python DB-API*:
 	- *forumdb.py*
 	- *3.3. Writing Code with DB API*
 	- *3.16. Reference — Python DB-API*
@@ -190,7 +190,7 @@ br3ndonland
 	- `select author from articles limit 10;` The `author` column in the `articles` table is a foreign key, "articles_author_fkey" that references the author `id` in the `authors` table.
 	- `select slug from articles;` shows there are only 8 articles.
 	- `select path from log limit 10;` `path` looks like `slug` from the `articles` table, but it is repeated every time the article is accessed. We need to group and count the paths to find out how many times each article was accessed.
-* I tried out some of the SQL queries from the Udacity project instructions (see *logs-udacity.md*), like
+* I tried out some of the SQL queries from the Udacity project instructions, like
 	```sql
 	select title, name
 	from articles, authors
@@ -207,7 +207,7 @@ Helpful reference info when building the SQL queries:
 * *3.16. Reference — Python DB-API*
 * *4.15. Reference — Deeper into SQL*
 
-I broke each query down, as recommended in the Udacity instructions, and repeatedly iterated until I got it.
+I broke each query down, as recommended in the [Udacity instructions](https://github.com/br3ndonland/udacity-fsnd03-p01-logs/blob/master/logs-udacity.md#q-these-queries-are-complicated-where-do-i-start), and repeatedly iterated until I got it.
 
 
 ### 1. What are the most popular three articles of all time?
@@ -420,7 +420,6 @@ news=> select title, views from (select substr(path, 10), count(*) as views from
  Bears love berries, alleges bear | 253801
  Bad things gone, say good people | 170098
 (3 rows)
-
 ```
 
 This also showed me that the order of columns in the `SELECT` statement doesn't need to match the order the tables are mentioned in the `FROM` statement.
@@ -467,7 +466,9 @@ vagrant@vagrant:/vagrant/logs$ python -c 'import logs; print(logs.popular_articl
 [('Candidate is jerk, alleges rival', 338647L), ('Bears love berries, alleges bear', 253801L), ('Bad things gone, say good people', 170098L)]
 ```
 
-I will need to reformat the output into a plain-text table like PostgreSQL. I tried a few different things. There is a `PrettyTable` module, but the Python distribution with Vagrant doesn't have it. I'll get back to this after finishing the second and third queries.
+I will need to reformat the output into a plain-text table like PostgreSQL. I'm surprised that `psycopg2` doesn't return SQL tables as output by default. Isn't that what you would expect?
+
+I tried a few different things. There is a `PrettyTable` module, but the Python distribution with Vagrant doesn't have it. I'll get back to this after finishing the second and third queries.
 
 
 ### 2. Who are the most popular article authors of all time?
@@ -513,10 +514,6 @@ select title, author, views from (select substr(path, 10), count(*) as views fro
  Media obsessed with bears          |      1 |  84383
 (8 rows)
 ```
-
-select count(views) as authorviews from (select substr(path, 10), count(*) as views from log where path !='/' group by path) as hits, articles where substr = slug group by author order by views desc;
-
-select title, author, views from (select substr(path, 10), count(*) as views from log where path !='/' group by path) as hits, articles where substr = slug order by author desc;
 
 Now to join the three tables, displaying information from all three to verify:
 
@@ -1052,7 +1049,7 @@ order by requests.date desc;
 **Awesome!**
 
 
-#### Identify days on which > 1% of requests were errors
+#### Identify days on which more than one percent of requests were errors
 
 Now I basically need to add in another calculation, probably something like `having http_404 > 0.01 * http_requests`. I tried `having` but it was easier to just add `and` to the `where` restriction instead.
 
@@ -1077,7 +1074,9 @@ YES! The query shows one day, July 17, on which more than 1% of queries led to e
 
 #### Display the error percentage
 
-I tried going a bit further to show the error percentage as a column:
+I tried going a bit further to show the error percentage as a column.
+
+I figured it would be something like:
 
 ```sql
 select errors.http_404 / requests.http_requests * 100 as error_percentage
@@ -1085,7 +1084,7 @@ select errors.http_404 / requests.http_requests * 100 as error_percentage
 
 It was difficult, because the `http_requests` and `http_404` columns are being created in this query.
 
-Solution? Another subquery!
+Maybe I need another subquery.
 
 This runs and displays the `error_percentage` column, but doesn't correctly calculate the percentage:
 
@@ -1098,7 +1097,7 @@ select requests_and_errors.date, http_requests, http_404, (http_404 / http_reque
 	order by requests.date desc) as requests_and_errors;
 ```
 
-I tried nesting the query even further:
+I tried nesting the query even further, unsuccessfully:
 
 ```sql
 select requests_and_errors.date, http_requests, http_404, error_percentage from
@@ -1109,8 +1108,96 @@ select requests_and_errors.date, http_requests, http_404, error_percentage from
 			where requests.date = errors.date
 			order by requests.date desc)
 		as requests_and_errors,
-;
+group by requests_and_errors.date desc;
 ```
 
+It gets difficult to keep track of this many subqueries.
+
+Git commit at this point:
+"Complete SQL query three up to sticking point"
+
+Instead of subqueries, I tried to calculate the error percentage from information in the original `logs` table:
+
+```sql
+select date_trunc('day', time) as date, count(status = '404 NOT FOUND') from log group by date;
+```
+
+The `count` returned is just the total number of requests though.
+
+
+#### Add the third SQL query to the Python code
+
+Eventually, I just decided to calculate the percentage in Python. I already need to format the output anyway, because `psycopg2` does not output plain text SQL tables like `psql`. I found it strange that `psycopg2` doesn't format the Python output like the plain-text tables from PostgreSQL. The whole point of `psycopg2` is to work with `psql`, so why doesn't it return the same output?
+
+I worked on [cleaning up the output](https://stackoverflow.com/questions/10598002/how-do-i-get-tables-in-postgres-using-psycopg2):
+
+```python
+    # Fetch all results from the cursor object
+    print("Query 1")
+    for table in c.fetchall():
+        print(table)
+    # Close connection
+    db.close()
+    pass
+```
+
+```bash
+vagrant@vagrant:/vagrant/logs$ python -c 'import logs; logs.popular_articles(), logs.popular_authors(), logs.errors()'
+```
+
+```
+Query 1
+('Candidate is jerk, alleges rival', 338647L)
+('Bears love berries, alleges bear', 253801L)
+('Bad things gone, say good people', 170098L)
+Query 2
+('Ursula La Multa', Decimal('507594'))
+('Rudolf von Treppenwitz', Decimal('423457'))
+('Anonymous Contributor', Decimal('170098'))
+('Markoff Chaney', Decimal('84557'))
+Query 3
+(datetime.datetime(2016, 7, 17, 0, 0, tzinfo=psycopg2.tz.FixedOffsetTimezone(offset=0, name=None)), 55907L, 1265L)
+```
+
+Still not great, especially for query 3.
+
+I was finally able to remove the timestamp from the date by converting it to a string, and slicing for characters 0-10, with `print("Date:", str(table[0])[:10])`. I also improved the output formatting by including a header line.
+
+```python
+    # Fetch all results from the cursor object
+    print('\n', 'Query 3: Days on which >1% HTTP requests returned 404 errors')
+    for table in c.fetchall():
+        # Convert datetime to string and slice to retain only the date
+        print('Date:', str(table[0])[:10])
+        # Calculate error rate
+        print('Percent errors:', float(table[2]) / float(table[1]) * 100)
+```
+
+Next, I simply changed the Linux command (just by guessing) from `python` to `python3`, to specify. The output was formatted correctly. Maybe my shebang line isn't working, though it's written correctly, or maybe this distribution of Linux ignores the shebang line.
+
+Here's the final Linux command:
+
+```bash
+vagrant@vagrant:/vagrant/logs$ python3 -c 'import logs; logs.popular_articles(), logs.popular_authors(), logs.errors()'
+```
+
+```
+ Query 1: Most popular three articles
+Candidate is jerk, alleges rival 338647
+Bears love berries, alleges bear 253801
+Bad things gone, say good people 170098
+
+ Query 2: Most popular authors
+Ursula La Multa 507594
+Rudolf von Treppenwitz 423457
+Anonymous Contributor 170098
+Markoff Chaney 84557
+
+ Query 3: Days on which >1% HTTP requests returned 404 errors
+Date: 2016-07-17
+Percent errors: 2.2626862468027262
+```
+
+**Done!**
 
 [(back to top)](#top)
