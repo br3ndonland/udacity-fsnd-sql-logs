@@ -9,28 +9,40 @@ import psycopg2
 DBNAME = 'news'
 
 
-# 1. Most popular three articles
-def popular_articles():
-    """Returns a sorted list of the three most highly accessed articles,
-    with the top article first.
-    """
+# Create a helper function to re-use code shared among the three SQL queries
+def get_query_results(query):
+    """Helper function for code shared among the three SQL queries."""
     # Connect to database
     db = psycopg2.connect(database=DBNAME)
     # Create a cursor object to run queries and scan through results
     c = db.cursor()
     # Execute the SQL query using the cursor
-    c.execute("""
+    c.execute(query)
+    # Fetch all results from the cursor object, and save as a results object
+    result = c.fetchall()
+    # Close connection
+    db.close()
+    return result
+
+
+# 1. Most popular three articles
+def popular_articles():
+    """Returns a sorted list of the three most highly accessed articles,
+    with the top article first.
+    """
+    # Save SQL query as object
+    query = ("""
         select title, num from
             (select substr(path, 10), count(*) as num from log
             where path !='/' group by path)
         as hits, articles where substr = slug order by num desc limit 3;
         """)
-    # Fetch all results from the cursor object
+    # Execute SQL query using the helper function
+    result = get_query_results(query)
+    # Print results
     print('\n', 'Query 1: Most popular three articles')
-    for table in c.fetchall():
-        print(table[0], int(table[1]))
-    # Close connection
-    db.close()
+    for title, num in result:
+        print('    {}  --  {} views'.format(title, num))
     pass
 
 
@@ -39,12 +51,8 @@ def popular_authors():
     """Returns a sorted list of the most popular article authors,
     with the most popular author at the top.
     """
-    # Connect to database
-    db = psycopg2.connect(database=DBNAME)
-    # Create a cursor object to run queries and scan through results
-    c = db.cursor()
-    # Execute the SQL query using the cursor
-    c.execute("""
+    # Save SQL query as object
+    query = ("""
         select name, sum(views) as total_views from
             (select name, author, title, views from
                 (select substr(path, 10), count(*) as views from log
@@ -54,12 +62,12 @@ def popular_authors():
                 order by views desc)
             as threetables group by name order by total_views desc;
         """)
-    # Fetch all results from the cursor object
+    # Execute SQL query using the helper function
+    result = get_query_results(query)
+    # Print results
     print('\n', 'Query 2: Most popular authors')
-    for table in c.fetchall():
-        print(table[0], int(table[1]))
-    # Close connection
-    db.close()
+    for name, total_views in result:
+        print('    {}  --  {} views'.format(name, total_views))
     pass
 
 
@@ -68,30 +76,31 @@ def errors():
     """Returns a list of days on which >1% of HTTP requests resulted in
     HTTP error codes.
     """
-    # Connect to database
-    db = psycopg2.connect(database=DBNAME)
-    # Create a cursor object to run queries and scan through results
-    c = db.cursor()
-    # Execute the SQL query using the cursor
-    c.execute("""
-        select requests.date, http_requests, http_404 from
-            (select date_trunc('day', time) as date, count(*)
-            as http_requests from log group by date)
+    # Save SQL query as object
+    query = ("""
+        select errdate, http_requests, http_404,
+        100.0 * http_404 / http_requests as errpct from
+            (select date_trunc('day', time) as reqdate, count(*)
+            as http_requests from log group by reqdate)
             as requests,
-            (select date_trunc('day', time) as date, count(*)
-            as http_404 from log where status = '404 NOT FOUND' group by date)
+            (select date_trunc('day', time) as errdate, count(*)
+            as http_404 from log where status = '404 NOT FOUND'
+            group by errdate)
             as errors
-        where requests.date = errors.date
+        where reqdate = errdate
         and errors.http_404 > 0.01 * requests.http_requests
-        order by requests.date desc;
+        order by errdate desc;
         """)
-    # Fetch all results from the cursor object
+    # Execute SQL query using the helper function
+    result = get_query_results(query)
+    # Print results
     print('\n', 'Query 3: Days on which >1% HTTP requests returned 404 errors')
-    for table in c.fetchall():
-        # Convert datetime to string and slice to retain only the date
-        print('Date:', str(table[0])[:10])
-        # Calculate error rate
-        print('Percent errors:', float(table[2]) / float(table[1]) * 100)
-    # Close connection
-    db.close()
+    for errdate, http_requests, http_404, errpct in result:
+        print("    {:%B %d, %Y}  --  {:.2f}% errors".format(errdate, errpct))
     pass
+
+
+if __name__ == "__main__":
+    popular_articles()
+    popular_authors()
+    errors()

@@ -1,16 +1,14 @@
 # Logs analysis project README
 
-<p align="left">
-    <a href="https://www.udacity.com/">
-        <img src="https://s3-us-west-1.amazonaws.com/udacity-content/rebrand/svg/logo.min.svg" width="300" alt="Udacity logo svg">
-    </a>
-</p>
+<a href="https://www.udacity.com/">
+    <img src="https://s3-us-west-1.amazonaws.com/udacity-content/rebrand/svg/logo.min.svg" width="300" alt="Udacity logo svg">
+</a>
 
 **Udacity Full Stack Web Developer Nanodegree program**
 
 Part 03. Backend
 
-Project 01. Logs analysis
+[Project 01. Logs analysis](https://github.com/br3ndonland/udacity-fsnd03-p01-logs)
 
 Brendon Smith
 
@@ -190,22 +188,24 @@ select name, sum(views) as total_views from
 Returns a list of days on which >1% of HTTP requests resulted in HTTP error codes.
 
 ```sql
-select requests.date, http_requests, http_404 from
-    (select date_trunc('day', time) as date, count(*)
-    as http_requests from log group by date)
+select errdate, http_requests, http_404,
+100.0 * http_404 / http_requests as errpct from
+    (select date_trunc('day', time) as reqdate, count(*)
+    as http_requests from log group by reqdate)
     as requests,
-    (select date_trunc('day', time) as date, count(*)
-    as http_404 from log where status = '404 NOT FOUND' group by date)
+    (select date_trunc('day', time) as errdate, count(*)
+    as http_404 from log where status = '404 NOT FOUND'
+    group by errdate)
     as errors
-where requests.date = errors.date
+where reqdate = errdate
 and errors.http_404 > 0.01 * requests.http_requests
-order by requests.date desc;
+order by errdate desc;
 ```
 
 ```
-          date          | http_requests | http_404
-------------------------+---------------+----------
- 2016-07-17 00:00:00+00 |         55907 |     1265
+        errdate         | http_requests | http_404 |       errpct
+------------------------+---------------+----------+--------------------
+ 2016-07-17 00:00:00+00 |         55907 |     1265 | 2.2626862468027260
 (1 row)
 ```
 
@@ -215,35 +215,36 @@ order by requests.date desc;
 
 Each query is included in a Python function in *logs.py*.
 
-To run the queries contained within the Python program:
+To run the queries contained within the Python program from the command line:
 
 Change into the directory containing the Python file:
+
 ```bash
 vagrant@vagrant:/vagrant$ cd logs
 ```
 
-Run the Python program:
+Run the Python program by directly invoking Python:
+
 ```bash
-vagrant@vagrant:/vagrant/logs$ python3 -c 'import logs; logs.popular_articles(), logs.popular_authors(), logs.errors()'
+vagrant@vagrant:/vagrant/logs$ python3 logs.py
 ```
 
 Python will return the results of the three queries in plain text, with Pythonic formatting modified from the original `psql` table format:
 
 ```
  Query 1: Most popular three articles
-Candidate is jerk, alleges rival 338647
-Bears love berries, alleges bear 253801
-Bad things gone, say good people 170098
+    Candidate is jerk, alleges rival  --  338647 views
+    Bears love berries, alleges bear  --  253801 views
+    Bad things gone, say good people  --  170098 views
 
  Query 2: Most popular authors
-Ursula La Multa 507594
-Rudolf von Treppenwitz 423457
-Anonymous Contributor 170098
-Markoff Chaney 84557
+    Ursula La Multa  --  507594 views
+    Rudolf von Treppenwitz  --  423457 views
+    Anonymous Contributor  --  170098 views
+    Markoff Chaney  --  84557 views
 
  Query 3: Days on which >1% HTTP requests returned 404 errors
-Date: 2016-07-17
-Percent errors: 2.2626862468027262
+    July 17, 2016  --  2.26% errors
 ```
 
 [(back to top)](#top)

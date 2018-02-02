@@ -1,14 +1,13 @@
  Query 1: Most popular three articles
-Candidate is jerk, alleges rival 338647
-Bears love berries, alleges bear 253801
-Bad things gone, say good people 170098
+    Candidate is jerk, alleges rival  --  338647 views
+    Bears love berries, alleges bear  --  253801 views
+    Bad things gone, say good people  --  170098 views
 
  Query 2: Most popular authors
-Ursula La Multa 507594
-Rudolf von Treppenwitz 423457
-Anonymous Contributor 170098
-Markoff Chaney 84557
+    Ursula La Multa  --  507594 views
+    Rudolf von Treppenwitz  --  423457 views
+    Anonymous Contributor  --  170098 views
+    Markoff Chaney  --  84557 views
 
  Query 3: Days on which >1% HTTP requests returned 404 errors
-Date: 2016-07-17
-Percent errors: 2.2626862468027262
+    July 17, 2016  --  2.26% errors
