@@ -1,15 +1,14 @@
-# Logs analysis project methods and notes
+# SQL database logs analysis project methods and notes
 
 **Udacity Full Stack Web Developer Nanodegree program**
 
-Part 03. Backend
-
-Project 01. Logs analysis
+Project 4. SQL database logs analysis
 
 Brendon Smith
 
 br3ndonland
 
+## TOC
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
@@ -38,7 +37,7 @@ br3ndonland
 
 
 ## Starting Python in *logs.py*
-[(back to top)](#top)
+[(Back to TOC)](#toc)
 
 * Shebang: when reading through the "Functionality" section of the rubric, I saw that it recommended "a correct shebang line to indicate the Python version." I actually hadn't written a shebang line before, but looked it up on [Stack Overflow](https://stackoverflow.com/questions/2429511/why-do-people-write-usr-bin-env-python-on-the-first-line-of-a-python-script) and drafted one.
 * I created an outline in the python file *logs.py* with the steps I would be working on. Here's the initial outline:
@@ -131,7 +130,7 @@ br3ndonland
 
 
 ## Starting the virtual machine and exploring the data
-[(back to top)](#top)
+[(Back to TOC)](#toc)
 
 * I already had vagrant installed from the instructions in *Lesson 2.17. Installing the Virtual Machine*.
 * I unzipped *newsdata.sql* and moved it into the *vagrant* directory.
@@ -199,7 +198,7 @@ br3ndonland
 
 
 ## SQL queries
-[(back to top)](#top)
+[(Back to TOC)](#toc)
 
 Helpful reference info when building the SQL queries:
 
@@ -211,7 +210,7 @@ I broke each query down, as recommended in the [Udacity instructions](https://gi
 
 
 ### 1. What are the most popular three articles of all time?
-[(back to top)](#top)
+[(Back to TOC)](#toc)
 
 #### Use the `log` table to count hits by `path`
 
@@ -472,7 +471,7 @@ I tried a few different things. There is a `PrettyTable` module, but the Python 
 
 
 ### 2. Who are the most popular article authors of all time?
-[(back to top)](#top)
+[(Back to TOC)](#toc)
 
 The second query is like an extension of the first, with an additional join to the authors table, and an aggregation to group the articles by author.
 
@@ -642,7 +641,7 @@ Git commit at this point:
 
 
 ### 3. On which days did more than one percent of requests lead to errors?
-[(back to top)](#top)
+[(Back to TOC)](#toc)
 
 I need to sum the total number of HTTP requests, and divide by the number of HTTP `404` error codes.
 
@@ -1200,4 +1199,4 @@ Percent errors: 2.2626862468027262
 
 **Done!**
 
-[(back to top)](#top)
+[(Back to TOC)](#toc)
