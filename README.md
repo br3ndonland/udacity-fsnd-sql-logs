@@ -1,4 +1,4 @@
-# SQL database logs analysis project README
+# README
 
 <a href="https://www.udacity.com/">
     <img src="https://s3-us-west-1.amazonaws.com/udacity-content/rebrand/svg/logo.min.svg" width="300" alt="Udacity logo svg">
@@ -6,7 +6,7 @@
 
 Udacity Full Stack Web Developer Nanodegree program
 
-Project 4. SQL database logs analysis
+Project 3. SQL database logs analysis
 
 Brendon Smith
 
@@ -16,15 +16,18 @@ br3ndonland
 
 - [Table of Contents](#table-of-contents)
 - [Project description](#project-description)
-- [Directory contents](#directory-contents)
+- [Repository contents](#repository-contents)
   - [Required files](#required-files)
   - [Other files](#other-files)
-- [Development environment](#development-environment)
-- [Linux and PostgreSQL](#linux-and-postgresql)
+- [Instructions](#instructions)
+  - [Install virtual machine](#install-virtual-machine)
+  - [Add application files](#add-application-files)
+  - [Run virtual machine](#run-virtual-machine)
+  - [Run application](#run-application)
 - [A tale of three queries](#a-tale-of-three-queries)
-  - [1. What are the most popular three articles of all time?](#1-what-are-the-most-popular-three-articles-of-all-time)
-  - [2. Who are the most popular article authors of all time?](#2-who-are-the-most-popular-article-authors-of-all-time)
-  - [3. On which days did more than 1% of requests lead to errors?](#3-on-which-days-did-more-than-1-of-requests-lead-to-errors)
+  - [1. Most popular articles](#1-most-popular-articles)
+  - [2. Most popular authors](#2-most-popular-authors)
+  - [3. HTTP request error rate](#3-http-request-error-rate)
 - [Running the queries with the Python program](#running-the-queries-with-the-python-program)
 
 ## Project description
@@ -35,7 +38,7 @@ I completed this project as part of the Udacity Full Stack Web Developer Nanodeg
 
 [(Back to TOC)](#table-of-contents)
 
-## Directory contents
+## Repository contents
 
 ### Required files
 
@@ -50,88 +53,89 @@ I completed this project as part of the Udacity Full Stack Web Developer Nanodeg
 
 [(Back to TOC)](#table-of-contents)
 
-## Development environment
+## Instructions
+
+### Install virtual machine
+
+A virtual machine can be used to run the code from an operating system with a defined configuration. The virtual machine has all the dependencies needed to run the application.
 
 I wrote the program in a Linux virtual machine with the following components:
 
-- *Oracle [VirtualBox](https://www.virtualbox.org/wiki/Downloads) Version 5.2.6 r120293 (Qt5.6.3)*
+- Oracle [VirtualBox](https://www.virtualbox.org/wiki/Downloads) Version 5.2.6 r120293 (Qt5.6.3)
   - Software that runs special containers called virtual machines, like Vagrant.
-- *[Vagrant](https://www.vagrantup.com/) 2.0.1 with Ubuntu 16.04.3 LTS (GNU/Linux 4.4.0-75-generic i686)*
+- [Vagrant](https://www.vagrantup.com/) 2.0.1 with Ubuntu 16.04.3 LTS (GNU/Linux 4.4.0-75-generic i686)
   - Software that provides the Linux operating system in a defined configuration, allowing it to run identically across many personal computers. Linux can then be run as a virtual machine with VirtualBox.
-- *[Udacity Virtual Machine configuration](https://github.com/udacity/fullstack-nanodegree-vm)*
+- [Udacity Virtual Machine configuration](https://github.com/udacity/fullstack-nanodegree-vm)
   - Repository from Udacity that configures Vagrant.
-  - I installed and ran Vagrant from within the directory *fullstack-nanodegree-vm/vagrant*.
-  - I also created a directory at *vagrant/logs*, and copied in *logs.py- after it was finished to run it.
-- *PostgreSQL 9.5.10*
-  - We used an implementation of SQL called PostgreSQL, included with the Linux distribution, to query the database.
-- `psycopg2`
-  - Python module that connects PostgreSQL databases with Python code.
-- *Python 3*
-  - Flexible and powerful computing language used to group and control the queries.
-- *[News database](https://d17h27t6h515a5.cloudfront.net/topher/2016/August/57b5f748_newsdata/newsdata.zip)*
-  - We downloaded the database as a zip archive, unzipped it, and moved it into the *fullstack-nanodegree-vm/vagrant- directory.
+  - My personal fork of the configuration is also available on [GitHub](https://github.com/br3ndonland/fullstack-nanodegree-vm) if needed.
 
-Further details can be found in the "Prepare the software and data" section of *[logs-udacity.md](logs-udacity.md)*.
+### Add application files
 
-[(Back to TOC)](#table-of-contents)
+- Clone the [application repository](https://github.com/br3ndonland/udacity-fsnd-p3-sql) into the *vagrant/* virtual machine directory.
+- Download the [news database](https://d17h27t6h515a5.cloudfront.net/topher/2016/August/57b5f748_newsdata/newsdata.zip) and save in the *vagrant/* virtual machine directory (not directly within the cloned repository).
 
-## Linux and PostgreSQL
+### Run virtual machine
 
-On the Linux command line:
+- Change into the vagrant directory on the command line (wherever you have it stored):
 
-Change into the Vagrant directory (wherever you have it stored):
+  ```bash
+  $ cd <path>/fullstack-nanodegree-vm/vagrant
+  ```
 
-```bash
-$ cd <path>/fullstack-nanodegree-vm/vagrant
-```
+- Start Vagrant (only necessary once per terminal session):
 
-Start Vagrant (only necessary once per terminal session):
+  ```bash
+  $ vagrant up
+  ```
 
-```bash
-$ vagrant up
-```
+- Log in to Ubuntu:
 
-Log in to Ubuntu:
+  ```bash
+  $ vagrant ssh
+  ```
 
-```bash
-$ vagrant ssh
-```
+### Run application
 
-Change into the Vagrant directory:
+- After logging into the virtual machine, change into the application directory:
 
-```bash
-vagrant@vagrant:~$ cd /vagrant
-```
+  ```bash
+  $ vagrant@vagrant:~$ cd /vagrant/udacity-fsnd-p3-sql
+  ```
 
-Connect to the database with PostgreSQL:
+- Change into the Vagrant directory:
 
-The first time:
+  ```bash
+  vagrant@vagrant:~$ cd /vagrant
+  ```
 
-```bash
-vagrant@vagrant:/vagrant$ psql -d news -f newsdata.sql
-```
+- Connect to the database with PostgreSQL:
+  - The first time:
 
-Subsequent logins:
+    ```bash
+    vagrant@vagrant:/vagrant$ psql -d news -f newsdata.sql
+    ```
 
-```bash
-vagrant@vagrant:/vagrant$ psql -d news
-```
+  - Subsequent logins:
 
-```text
-psql (9.5.10)
-Type "help" for help.
+    ```bash
+    vagrant@vagrant:/vagrant$ psql -d news
+    ```
 
-news=>
-```
+- Enter SQL queries at the `=>` prompt. The queries can be more efficiently run from the Python program, as described [below](#running-the-queries-with-the-python-program).
 
-The queries can be entered directly at the `news=>` prompt, or run from the Python program, as described [below](#running-the-queries-with-the-python-program).
+  ```text
+  psql (9.5.10)
+  Type "help" for help.
 
-To exit the `psql` prompt, simply type `\q` and hit enter:
+  news=>
+  ```
 
-```bash
-news=> \q
-vagrant@vagrant:/vagrant$
-```
+- To exit the `psql` prompt, simply type `\q` and hit enter:
+
+  ```bash
+  news=> \q
+  vagrant@vagrant:/vagrant$
+  ```
 
 [(Back to TOC)](#table-of-contents)
 
@@ -139,9 +143,13 @@ vagrant@vagrant:/vagrant$
 
 I implemented three SQL queries:
 
-### 1. What are the most popular three articles of all time?
+### 1. Most popular articles
+
+*What are the most popular three articles of all time?*
 
 Returns a sorted list of the three most highly accessed articles, with the top article first.
+
+Query:
 
 ```sql
 select title, num from
@@ -149,6 +157,8 @@ select title, num from
     where path !='/' group by path)
 as hits, articles where substr = slug order by num desc limit 3;
 ```
+
+Linux output:
 
 ```text
               title               | views
@@ -159,9 +169,13 @@ as hits, articles where substr = slug order by num desc limit 3;
 (3 rows)
 ```
 
-### 2. Who are the most popular article authors of all time?
+### 2. Most popular authors
+
+*Who are the most popular article authors of all time?*
 
 Returns a sorted list of the most popular article authors, with the most popular author at the top.
+
+Query:
 
 ```sql
 select name, sum(views) as total_views from
@@ -174,6 +188,8 @@ select name, sum(views) as total_views from
     as threetables group by name order by total_views desc;
 ```
 
+Linux output:
+
 ```text
           name          | total_views
 ------------------------+-------------
@@ -184,9 +200,13 @@ select name, sum(views) as total_views from
 (4 rows)
 ```
 
-### 3. On which days did more than 1% of requests lead to errors?
+### 3. HTTP request error rate
+
+*On which days did more than 1% of requests lead to errors?*
 
 Returns a list of days on which >1% of HTTP requests resulted in HTTP error codes.
+
+Query:
 
 ```sql
 select errdate, http_requests, http_404,
@@ -203,12 +223,15 @@ and errors.http_404 > 0.01 - requests.http_requests
 order by errdate desc;
 ```
 
+Linux output:
+
 ```text
         errdate         | http_requests | http_404 |       errpct
 ------------------------+---------------+----------+--------------------
  2016-07-17 00:00:00+00 |         55907 |     1265 | 2.2626862468027260
 (1 row)
 ```
+
 [(Back to TOC)](#table-of-contents)
 
 ## Running the queries with the Python program
@@ -229,7 +252,7 @@ Run the Python program by directly invoking Python:
 vagrant@vagrant:/vagrant/logs$ python3 logs.py
 ```
 
-Python will return the results of the three queries in plain text, with Pythonic formatting modified from the original `psql` table format:
+Python will return the results of the three queries in plain text output in the Linux terminal, with Pythonic formatting modified from the original `psql` table format:
 
 ```text
  Query 1: Most popular three articles

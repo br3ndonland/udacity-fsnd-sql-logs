@@ -1,216 +1,226 @@
-# SQL database logs analysis project methods and notes
+# Computational narrative
 
-**Udacity Full Stack Web Developer Nanodegree program**
+<a href="https://www.udacity.com/">
+    <img src="https://s3-us-west-1.amazonaws.com/udacity-content/rebrand/svg/logo.min.svg" width="300" alt="Udacity logo svg">
+</a>
 
-Project 4. SQL database logs analysis
+Udacity Full Stack Web Developer Nanodegree program
+
+Project 3. SQL database logs analysis
 
 Brendon Smith
 
 br3ndonland
 
-## TOC
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+## Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Setup](#setup)
 - [Starting Python in *logs.py*](#starting-python-in-logspy)
 - [Starting the virtual machine and exploring the data](#starting-the-virtual-machine-and-exploring-the-data)
-- [SQL queries](#sql-queries)
-  - [1. What are the most popular three articles of all time?](#1-what-are-the-most-popular-three-articles-of-all-time)
-  - [2. Who are the most popular article authors of all time?](#2-who-are-the-most-popular-article-authors-of-all-time)
-  - [3. On which days did more than one percent of requests lead to errors?](#3-on-which-days-did-more-than-one-percent-of-requests-lead-to-errors)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
+- [A tale of three queries](#a-tale-of-three-queries)
+  - [1. Most popular articles](#1-most-popular-articles)
+  - [2. Most popular authors](#2-most-popular-authors)
+  - [3. HTTP request error rate](#3-http-request-error-rate)
 
 ## Setup
 
-* I read through the Udacity documentation and rubric (see *logs-udacity.md*)
-* Files:
-	- *logs-methods.md* (this file) to log my progress
-	- *logs-udacity.md* to store the project information and rubric from Udacity
-	- *logs.py* for the main program code
-	- *logs-output.txt* to store sample output from the program
-	- *README.md* for a concise description of the project
-* I kept vagrant and the database in a separate directory because of the large size of the database file.
-
+- I read through the Udacity documentation and rubric (see *[logs-udacity.md](logs-udacity.md)*)
+- I kept vagrant and the database in a separate directory because of the large size of the database file.
 
 ## Starting Python in *logs.py*
-[(Back to TOC)](#toc)
 
-* Shebang: when reading through the "Functionality" section of the rubric, I saw that it recommended "a correct shebang line to indicate the Python version." I actually hadn't written a shebang line before, but looked it up on [Stack Overflow](https://stackoverflow.com/questions/2429511/why-do-people-write-usr-bin-env-python-on-the-first-line-of-a-python-script) and drafted one.
-* I created an outline in the python file *logs.py* with the steps I would be working on. Here's the initial outline:
-	```python
-	#!/usr/bin/env python3
+- Shebang: when reading through the "Functionality" section of the rubric, I saw that it recommended "a correct shebang line to indicate the Python version." I actually hadn't written a shebang line before, but looked it up on [Stack Overflow](https://stackoverflow.com/questions/2429511/why-do-people-write-usr-bin-env-python-on-the-first-line-of-a-python-script) and drafted one.
+- I created an outline in the python file *logs.py- with the steps I would be working on. Here's the initial outline:
 
-	# Udacity database logs analysis project
+  ```python
+  #!/usr/bin/env python3
 
-	# 1. Most popular three articles
+  # Udacity database logs analysis project
 
-	# 2. Most popular authors
+  # 1. Most popular three articles
 
-	# 3. Days on which >1% of HTTP requests led to errors
+  # 2. Most popular authors
 
-	```
-* *To function or not to function:* Next, I decided to write each of the three queries as a Python function. I began building the functions based on the resources from *Lesson 03. Python DB-API*:
-	- *forumdb.py*
-	- *3.3. Writing Code with DB API*
-	- *3.16. Reference — Python DB-API*
-	```python
-	#!/usr/bin/env python3
+  # 3. Days on which >1% of HTTP requests led to errors
 
-	# Udacity database logs analysis project
+  ```
 
-	# Import the psycopg2 module to work with PostgreSQL
-	import psycopg2
+- *To function or not to function:- Next, I decided to write each of the three queries as a Python function. I began building the functions based on the resources from *Lesson 03. Python DB-API*:
+  - *forumdb.py*
+  - *3.3. Writing Code with DB API*
+  - *3.16. Reference — Python DB-API*
 
-	# Store the database name as an object for easy reference in functions
-	DBNAME = "news"
+  ```python
+  #!/usr/bin/env python3
 
+  # Udacity database logs analysis project
 
-	# 1. Most popular three articles
-	def popular_articles():
-	    """Returns a sorted list of the three most highly accessed articles,
-	    with the top article first.
-	    """
-	    # Connect to database
-	    db = psycopg2.connect(database=DBNAME)
-	    # Create a cursor object to run queries and scan through results
-	    c = db.cursor()
-	    # Execute the SQL query using the cursor
-	    c.execute()
-	    # Fetch all results from the cursor object
-	    articles = c.fetchall()
-	    print(articles)
-	    # Close connection
-	    db.close()
-	    pass
+  # Import the psycopg2 module to work with PostgreSQL
+  import psycopg2
+
+  # Store the database name as an object for easy reference in functions
+  DBNAME = "news"
 
 
-	# 2. Most popular authors
-	def popular_authors():
-	    """Returns a sorted list of the most popular article authors,
-	    with the most popular author at the top.
-	    """
-	    # Connect to database
-	    db = psycopg2.connect(database=DBNAME)
-	    # Create a cursor object to run queries and scan through results
-	    c = db.cursor()
-	    # Execute the SQL query using the cursor
-	    c.execute()
-	    # Fetch all results from the cursor object
-	    authors = c.fetchall()
-	    print(authors)
-	    # Close connection
-	    db.close()
-	    pass
+  # 1. Most popular three articles
+  def popular_articles():
+      """Returns a sorted list of the three most highly accessed articles,
+      with the top article first.
+      """
+      # Connect to database
+      db = psycopg2.connect(database=DBNAME)
+      # Create a cursor object to run queries and scan through results
+      c = db.cursor()
+      # Execute the SQL query using the cursor
+      c.execute()
+      # Fetch all results from the cursor object
+      articles = c.fetchall()
+      print(articles)
+      # Close connection
+      db.close()
+      pass
 
 
-	# 3. Days on which >1% of HTTP requests led to errors
-	def errors():
-	    """Returns a list of days on which >1% of HTTP requests resulted in
-	    HTTP error codes.
-	    """
-	    # Connect to database
-	    db = psycopg2.connect(database=DBNAME)
-	    # Create a cursor object to run queries and scan through results
-	    c = db.cursor()
-	    # Execute the SQL query using the cursor
-	    c.execute()
-	    # Fetch all results from the cursor object
-	    errors = c.fetchall()
-	    print(errors)
-	    # Close connection
-	    db.close()
-	    pass
+  # 2. Most popular authors
+  def popular_authors():
+      """Returns a sorted list of the most popular article authors,
+      with the most popular author at the top.
+      """
+      # Connect to database
+      db = psycopg2.connect(database=DBNAME)
+      # Create a cursor object to run queries and scan through results
+      c = db.cursor()
+      # Execute the SQL query using the cursor
+      c.execute()
+      # Fetch all results from the cursor object
+      authors = c.fetchall()
+      print(authors)
+      # Close connection
+      db.close()
+      pass
 
-	```
-* Git commit at this point: "Initialize files and code outline"
 
+  # 3. Days on which >1% of HTTP requests led to errors
+  def errors():
+      """Returns a list of days on which >1% of HTTP requests resulted in
+      HTTP error codes.
+      """
+      # Connect to database
+      db = psycopg2.connect(database=DBNAME)
+      # Create a cursor object to run queries and scan through results
+      c = db.cursor()
+      # Execute the SQL query using the cursor
+      c.execute()
+      # Fetch all results from the cursor object
+      errors = c.fetchall()
+      print(errors)
+      # Close connection
+      db.close()
+      pass
+
+  ```
+
+- Git commit at this point: "Initialize files and code outline"
+
+[(Back to TOC)](#table-of-contents)
 
 ## Starting the virtual machine and exploring the data
-[(Back to TOC)](#toc)
 
-* I already had vagrant installed from the instructions in *Lesson 2.17. Installing the Virtual Machine*.
-* I unzipped *newsdata.sql* and moved it into the *vagrant* directory.
-* I changed into the vagrant directory and started up vagrant (only necessary when restarting computer):
-	```bash
-	$ vagrant up
-	```
-* I then logged in to Ubuntu as before
-	```bash
-	$ vagrant ssh
-	```
-* I connected to the database and loaded the data with PostgreSQL:
-	```bash
-	$ cd /vagrant
-	/vagrant$ psql -d news -f newsdata.sql
-	```
-	As explained in the Udacity documentation for the project (see *logs-udacity.md*):
-	> Here's what this command does:
-	> 
-	> * `psql` — the PostgreSQL command line program
-	> * `-d news` — connect to the database named news which has been set up for you
-	> * `-f newsdata.sql` — run the SQL statements in the file newsdata.sql
-	> 
-	> Running this command will connect to your installed database server and execute the SQL commands in the downloaded file, creating tables and populating them with data.
-	
-	This only needs to be done once. When reconnecting, after `vagrant up` and `vagrant ssh`, simply use 
-	```bash
-	$ cd /vagrant
-	/vagrant$ psql -d news
-	```
-	and to log out (the opposite of `vagrant ssh`), just type ctrl+d or
-	```bash
-	$ logout
-	```
-* I then began exploring the data by running commands in the vagrant Linux terminal. This helped me understand how to build the SQL queries.
-* I started by viewing the tables:
-	```
-	/vagrant$ psql -d news
-	psql (9.5.10)
-	Type "help" for help.
+- I already had vagrant installed from the instructions in *Lesson 2.17. Installing the Virtual Machine*.
+- I unzipped *newsdata.sql- and moved it into the *vagrant- directory.
+- I changed into the vagrant directory and started up vagrant (only necessary when restarting computer):
 
-	news=> \dt
-	          List of relations
-	 Schema |   Name   | Type  |  Owner
-	--------+----------+-------+---------
-	 public | articles | table | vagrant
-	 public | authors  | table | vagrant
-	 public | log      | table | vagrant
-	(3 rows)
-	```
-* Next, I viewed the columns of each table.
-	- `\d articles`
-	- `\d authors`
-	- `\d log`
-* I then broke it down further and started looking at the content of the columns.
-	- `select author from articles limit 10;` The `author` column in the `articles` table is a foreign key, "articles_author_fkey" that references the author `id` in the `authors` table.
-	- `select slug from articles;` shows there are only 8 articles.
-	- `select path from log limit 10;` `path` looks like `slug` from the `articles` table, but it is repeated every time the article is accessed. We need to group and count the paths to find out how many times each article was accessed.
-* I tried out some of the SQL queries from the Udacity project instructions, like
-	```sql
-	select title, name
-	from articles, authors
-	where articles.author = authors.id;
-	```
+  ```bash
+  $ vagrant up
+  ```
 
+- I then logged in to Ubuntu as before
 
-## SQL queries
-[(Back to TOC)](#toc)
+  ```bash
+  $ vagrant ssh
+  ```
+
+- I connected to the database and loaded the data with PostgreSQL:
+
+  ```bash
+  $ cd /vagrant
+  /vagrant$ psql -d news -f newsdata.sql
+  ```
+
+  As explained in the Udacity documentation for the project (see *logs-udacity.md*):
+  > Here's what this command does:
+  >
+  > - `psql` — the PostgreSQL command line program
+  > - `-d news` — connect to the database named news which has been set up for you
+  > - `-f newsdata.sql` — run the SQL statements in the file newsdata.sql
+  >
+  > Running this command will connect to your installed database server and execute the SQL commands in the downloaded file, creating tables and populating them with data.
+
+  This only needs to be done once. When reconnecting, after `vagrant up` and `vagrant ssh`, simply use
+
+  ```bash
+  $ cd /vagrant
+  /vagrant$ psql -d news
+  ```
+
+  and to log out (the opposite of `vagrant ssh`), just type ctrl+d or
+
+  ```bash
+  $ logout
+  ```
+
+- I then began exploring the data by running commands in the vagrant Linux terminal. This helped me understand how to build the SQL queries.
+- I started by viewing the tables:
+
+  ```text
+  /vagrant$ psql -d news
+  psql (9.5.10)
+  Type "help" for help.
+
+  news=> \dt
+            List of relations
+   Schema |   Name   | Type  |  Owner
+  --------+----------+-------+---------
+   public | articles | table | vagrant
+   public | authors  | table | vagrant
+   public | log      | table | vagrant
+  (3 rows)
+  ```
+
+- Next, I viewed the columns of each table.
+  - `\d articles`
+  - `\d authors`
+  - `\d log`
+- I then broke it down further and started looking at the content of the columns.
+  - `select author from articles limit 10;` The `author` column in the `articles` table is a foreign key, "articles_author_fkey" that references the author `id` in the `authors` table.
+  - `select slug from articles;` shows there are only 8 articles.
+  - `select path from log limit 10;` `path` looks like `slug` from the `articles` table, but it is repeated every time the article is accessed. We need to group and count the paths to find out how many times each article was accessed.
+- I tried out some of the SQL queries from the Udacity project instructions, like
+
+  ```sql
+  select title, name
+  from articles, authors
+  where articles.author = authors.id;
+  ```
+
+[(Back to TOC)](#table-of-contents)
+
+## A tale of three queries
 
 Helpful reference info when building the SQL queries:
 
-* *2.18. Reference — Elements of SQL*
-* *3.16. Reference — Python DB-API*
-* *4.15. Reference — Deeper into SQL*
+- *2.18. Reference — Elements of SQL*
+- *3.16. Reference — Python DB-API*
+- *4.15. Reference — Deeper into SQL*
 
 I broke each query down, as recommended in the [Udacity instructions](https://github.com/br3ndonland/udacity-fsnd03-p01-logs/blob/master/logs-udacity.md#q-these-queries-are-complicated-where-do-i-start), and repeatedly iterated until I got it.
 
+[(Back to TOC)](#table-of-contents)
 
-### 1. What are the most popular three articles of all time?
-[(Back to TOC)](#toc)
+### 1. Most popular articles
+
+*What are the most popular three articles of all time?*
 
 #### Use the `log` table to count hits by `path`
 
@@ -222,7 +232,7 @@ news=> select path, count(*) as num from log group by path order by num desc;
 
 This shows a list of 212 rows.
 
-```
+```text
                 path                 |  num
 -------------------------------------+--------
  /                                   | 479121
@@ -258,7 +268,7 @@ The `offset 1` isn't totally ideal, because it's possible for one of the article
 news=> select path, count(*) as num from log where path !='/' group by path order by num desc limit 3;
 ```
 
-```
+```text
             path             |  num
 -----------------------------+--------
  /article/candidate-is-jerk  | 338647
@@ -266,7 +276,6 @@ news=> select path, count(*) as num from log where path !='/' group by path orde
  /article/bad-things-gone    | 170098
 (3 rows)
 ```
-
 
 #### Convert `path` in `log` to match `slug` in `articles`
 
@@ -276,7 +285,7 @@ Let's review the two tables we're trying to join:
 news=> select id, slug, title from articles;
 ```
 
-```
+```text
  id |           slug            |               title
 ----+---------------------------+------------------------------------
  23 | bad-things-gone           | Bad things gone, say good people
@@ -294,7 +303,7 @@ news=> select id, slug, title from articles;
 news=> select path, count(*) as num from log where path !='/' group by path order by num desc limit 3;
 ```
 
-```
+```text
             path             |  num
 -----------------------------+--------
  /article/candidate-is-jerk  | 338647
@@ -309,7 +318,7 @@ Let's start by just trying a simple join between the two tables.
 news=> select path, slug from log, articles limit 10;
 ```
 
-```
+```text
             path            |           slug
 ----------------------------+---------------------------
  /                          | bad-things-gone
@@ -329,7 +338,7 @@ Alright, so that's totally mismatched.
 
 There is no foreign key here, but the `path` column is similar to the `slug` column in the articles table. I will need to slice the contents of each row in the `path` column to remove `/article/` from the list, to match with the `slug`, like `path[9:]` if it was Python.
 
-This was a sticking point for me. I was stuck at this step for about a day. I had to browse my notes and documentation. I was thinking about using the `LIKE` operator to match based on certain conditions, but that doesn't really slice out the contents of each row in the `path` column. 
+This was a sticking point for me. I was stuck at this step for about a day. I had to browse my notes and documentation. I was thinking about using the `LIKE` operator to match based on certain conditions, but that doesn't really slice out the contents of each row in the `path` column.
 
 I was looking through ["A Gentle Introduction to SQL Using SQLite Part II"](https://github.com/tthibo/SQL-Tutorial), that I was referred to during [computefest2018-pandas](https://github.com/Harvard-IACS/computefest2018-pandas). I got to the [`SUBSTRING` section](https://github.com/tthibo/SQL-Tutorial/blob/master/tutorial_files/part2.textile#substr), tried reformatting my query to select a substring in the `path` column of the `log` table, and... that was it!
 
@@ -337,7 +346,7 @@ I was looking through ["A Gentle Introduction to SQL Using SQLite Part II"](http
 news=> select substr(path, 10), count(*) as num from log where path !='/' group by path order by num desc limit 3;
 ```
 
-```
+```text
        substr       |  num
 --------------------+--------
  candidate-is-jerk  | 338647
@@ -348,7 +357,6 @@ news=> select substr(path, 10), count(*) as num from log where path !='/' group 
 
 **Yes!**
 
-
 #### Combine the hit count and the join of `log` and `articles` into a single SQL statement
 
 Now time to write the full query! I started off just drafting it in plain English:
@@ -357,22 +365,25 @@ Now time to write the full query! I started off just drafting it in plain Englis
 
 Wow, alright. Let's break that down:
 
-* where the `substr` from `log` matches the `slug` from `articles`:
-	```sql
-	where log.substr = articles.slug
-	```
-* show the `title` column from `articles` with the `num` count column created by the aggregation in `log`:
-	```sql
-	select title, num
-	```
+- where the `substr` from `log` matches the `slug` from `articles`:
+
+  ```sql
+  where log.substr = articles.slug
+  ```
+
+- show the `title` column from `articles` with the `num` count column created by the aggregation in `log`:
+
+  ```sql
+  select title, num
+  ```
 
 Now let's put that together.
 
 My first query didn't work:
 
 ```sql
-select title, num from articles, 
-	(select substr(path, 10), count(*) as num from log where path !='/' group by path order by num desc) as hits
+select title, num from articles,
+  (select substr(path, 10), count(*) as num from log where path !='/' group by path order by num desc) as hits
 where log.substr = articles.slug limit 3;
 ```
 
@@ -382,7 +393,7 @@ I had to break it down further. I started by working the successful query into a
 select num from (select substr(path, 10), count(*) as num from log where path !='/' group by path order by num desc limit 3) as hits;
 ```
 
-```
+```text
   num
 --------
  338647
@@ -397,7 +408,7 @@ Next, I continued iterating to get my first join of `log` and `articles`:
 news=> select title, num from (select substr(path, 10), count(*) as num from log where path !='/' group by path order by num desc limit 3) as hits, articles limit 3;
 ```
 
-```
+```text
               title               |  num
 ----------------------------------+--------
  Bad things gone, say good people | 338647
@@ -412,7 +423,7 @@ Now I needed to establish the join condition. After a few more iterations, I got
 news=> select title, views from (select substr(path, 10), count(*) as views from log where path !='/' group by path) as hits, articles where substr = slug order by views desc limit 3;
 ```
 
-```
+```text
               title               | views
 ----------------------------------+--------
  Candidate is jerk, alleges rival | 338647
@@ -423,10 +434,9 @@ news=> select title, views from (select substr(path, 10), count(*) as views from
 
 This also showed me that the order of columns in the `SELECT` statement doesn't need to match the order the tables are mentioned in the `FROM` statement.
 
-
 #### Add the first SQL query to the Python code
 
-I plugged this into the Python code in *logs.py* to test it out. I reformatted the SQL query for Python with help from the [psycopg2](http://initd.org/psycopg/docs/usage.html#passing-parameters-to-sql-queries) docs:
+I plugged this into the Python code in *logs.py- to test it out. I reformatted the SQL query for Python with help from the [psycopg2](http://initd.org/psycopg/docs/usage.html#passing-parameters-to-sql-queries) docs:
 
 ```python
 # 1. Most popular three articles
@@ -453,7 +463,7 @@ def popular_articles():
 
 ```
 
-In order to run the Python code within Vagrant, I created a */vagrant/logs* directory and copied in the *logs.py* file.
+In order to run the Python code within Vagrant, I created a */vagrant/logs- directory and copied in the *logs.py- file.
 
 I then formatted the Linux command line argument to call the function, with a little help from [Stack Overflow](https://stackoverflow.com/questions/3987041/python-run-function-from-the-command-line#3987113) via a [DuckDuckGo](https://duckduckgo.com) search for "run python functions from command line":
 
@@ -461,7 +471,7 @@ I then formatted the Linux command line argument to call the function, with a li
 vagrant@vagrant:/vagrant/logs$ python -c 'import logs; print(logs.popular_articles())'
 ```
 
-```
+```text
 [('Candidate is jerk, alleges rival', 338647L), ('Bears love berries, alleges bear', 253801L), ('Bad things gone, say good people', 170098L)]
 ```
 
@@ -469,12 +479,13 @@ I will need to reformat the output into a plain-text table like PostgreSQL. I'm 
 
 I tried a few different things. There is a `PrettyTable` module, but the Python distribution with Vagrant doesn't have it. I'll get back to this after finishing the second and third queries.
 
+[(Back to TOC)](#table-of-contents)
 
-### 2. Who are the most popular article authors of all time?
-[(Back to TOC)](#toc)
+### 2. Most popular authors
+
+*Who are the most popular article authors of all time?*
 
 The second query is like an extension of the first, with an additional join to the authors table, and an aggregation to group the articles by author.
-
 
 #### Join the three tables
 
@@ -484,7 +495,7 @@ I started off viewing the `name` and `id` columns from the `authors` table, so I
 news=> select name, id from authors;
 ```
 
-```
+```text
           name          | id
 ------------------------+----
  Ursula La Multa        |  1
@@ -500,7 +511,7 @@ Next, I merged the `log` table and `articles` table as before, eliminating the `
 select title, author, views from (select substr(path, 10), count(*) as views from log where path !='/' group by path) as hits, articles where substr = slug order by views desc;
 ```
 
-```
+```text
                title                | author | views
 ------------------------------------+--------+--------
  Candidate is jerk, alleges rival   |      2 | 338647
@@ -520,7 +531,7 @@ Now to join the three tables, displaying information from all three to verify:
 select name, author, title, views from (select substr(path, 10), count(*) as views from log where path !='/' group by path) as hits, articles, authors where substr = slug and author = authors.id order by views desc;
 ```
 
-```
+```text
           name          | author |               title                | views
 ------------------------+--------+------------------------------------+--------
  Rudolf von Treppenwitz |      2 | Candidate is jerk, alleges rival   | 338647
@@ -536,21 +547,18 @@ select name, author, title, views from (select substr(path, 10), count(*) as vie
 
 The second query, up to this point, only took me a few iterations over maybe an hour. The next part took me several more hours.
 
-
 #### Aggregate article views by author
 
-*Aggregation aggravation*
-
-This step was more difficult. I tried creating views, but wasn't able to create a view and select from that view in the same SQL query (remember each of the three queries has to be a self-contained query).
+*Aggregation aggravation:* This step was more difficult. I tried creating views, but wasn't able to create a view and select from that view in the same SQL query (remember each of the three queries has to be a self-contained query).
 
 I started moving in the right direction by nesting the entire subquery from the "Join the three tables" step above inside another query:
 
 ```sql
-select name, views from 
+select name, views from
 (select name, author, title, views from (select substr(path, 10), count(*) as views from log where path !='/' group by path) as hits, articles, authors where substr = slug and author = authors.id order by views desc) as threetables;
 ```
 
-```
+```text
           name          | views
 ------------------------+--------
  Rudolf von Treppenwitz | 338647
@@ -566,14 +574,14 @@ select name, views from
 
 This narrows down the table to the columns I want, but I still need the aggregation.
 
-I was able to successfully complete the aggregation by adding two parts: 
+I was able to successfully complete the aggregation by adding two parts:
 
-* `sum(views) as total_views` at the beginning, before the long nested subquery
-* `group by name order by total_views desc`, after the long nested subquery, to tell `psql` how to compute the sum.
+- `sum(views) as total_views` at the beginning, before the long nested subquery
+- `group by name order by total_views desc`, after the long nested subquery, to tell `psql` how to compute the sum.
 
 ```sql
-select name, sum(views) as total_views from 
-    (select name, author, title, views from 
+select name, sum(views) as total_views from
+    (select name, author, title, views from
         (select substr(path, 10), count(*) as views from log
             where path !='/' group by path)
         as hits, articles, authors
@@ -582,7 +590,7 @@ select name, sum(views) as total_views from
     as threetables group by name order by total_views desc;
 ```
 
-```
+```text
           name          | total_views
 ------------------------+-------------
  Ursula La Multa        |      507594
@@ -593,7 +601,6 @@ select name, sum(views) as total_views from
 ```
 
 **Success!**
-
 
 #### Add the second SQL query to the Python code
 
@@ -631,27 +638,29 @@ I copied the updated code into the vagrant directory as before, then ran the cod
 vagrant@vagrant:/vagrant/logs$ python -c 'import logs; print(logs.popular_articles(), logs.popular_authors())'
 ```
 
-```
+```text
 ([('Candidate is jerk, alleges rival', 338647L), ('Bears love berries, alleges bear', 253801L), ('Bad things gone, say good people', 170098L)], [('Ursula La Multa', Decimal('507594')), ('Rudolf von Treppenwitz', Decimal('423457')), ('Anonymous Contributor', Decimal('170098')), ('Markoff Chaney', Decimal('84557'))])
 ```
 
-Git commit at this point: 
+Git commit at this point:
 
 "Complete SQL queries one and two"
 
+[(Back to TOC)](#table-of-contents)
 
-### 3. On which days did more than one percent of requests lead to errors?
-[(Back to TOC)](#toc)
+### 3. HTTP request error rate
+
+*On which days did more than one percent of requests lead to errors?*
 
 I need to sum the total number of HTTP requests, and divide by the number of HTTP `404` error codes.
 
 I started by reviewing the contents of the `log` table:
 
-```
+```text
 \d log
 ```
 
-```
+```text
                                   Table "public.log"
  Column |           Type           |                    Modifiers
 --------+--------------------------+--------------------------------------------------
@@ -671,7 +680,7 @@ A quick view of the `status` column in the `log` table shows two status codes, `
 news=> select status from log group by status;
 ```
 
-```
+```text
     status
 ---------------
  404 NOT FOUND
@@ -685,7 +694,7 @@ Each HTTP request returns a `status` and `time`:
 news=> select status, time from log limit 5;
 ```
 
-```
+```text
  status |          time
 --------+------------------------
  200 OK | 2016-07-01 07:00:00+00
@@ -695,7 +704,6 @@ news=> select status, time from log limit 5;
  200 OK | 2016-07-01 07:00:23+00
 (5 rows)
 ```
-
 
 #### Group requests by day
 
@@ -707,7 +715,7 @@ I took a look at the PostgreSQL documentation, and quickly found the entry for [
 select date_trunc('day', time) as date, status from log limit 5;
 ```
 
-```
+```text
           date          | status
 ------------------------+--------
  2016-07-01 00:00:00+00 | 200 OK
@@ -732,7 +740,7 @@ I was able to group the entries by date, revealing that the table was logging HT
 select date_trunc('day', time) as date from log group by date;
 ```
 
-```
+```text
           date
 ------------------------
  2016-07-01 00:00:00+00
@@ -770,14 +778,13 @@ select date_trunc('day', time) as date from log group by date;
  2016-07-26 00:00:00+00
 ```
 
-
 #### Count the number of HTTP requests per day
 
 One of my query attempts actually hung the virtual machine. I think it was including `from log` at the top level of the query.
 
 I logged in with a separate terminal window and used the `top` command to troubleshoot.
 
-```
+```text
 /vagrant$ psql -d news
 psql (9.5.10)
 Type "help" for help.
@@ -797,7 +804,7 @@ $ vagrant ssh
 vagrant@vagrant:~$ top
 ```
 
-```
+```text
 top - 13:12:30 up 15:05,  2 users,  load average: 0.97, 0.50, 0.20
 Tasks: 110 total,   2 running, 108 sleeping,   0 stopped,   0 zombie
 %Cpu(s): 98.7 us,  1.3 sy,  0.0 ni,  0.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
@@ -830,7 +837,7 @@ I actually couldn't kill the process.
 vagrant@vagrant:~$ kill -9 1508
 ```
 
-```
+```text
 -bash: kill: (1508) - Operation not permitted
 ```
 
@@ -852,7 +859,7 @@ Now to build in the date truncation:
 select date_trunc('day', time) as date, count(*) as http_requests from log group by date order by date desc;
 ```
 
-```
+```text
           date          | http_requests
 ------------------------+---------------
  2016-07-31 00:00:00+00 |         45845
@@ -891,7 +898,6 @@ select date_trunc('day', time) as date, count(*) as http_requests from log group
 
 **Alright!**
 
-
 #### Count the number of errors per day
 
 I modified the total HTTP requests query to return the HTTP 404 errors:
@@ -900,7 +906,7 @@ I modified the total HTTP requests query to return the HTTP 404 errors:
 select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date order by date desc;
 ```
 
-```
+```text
           date          | http_404
 ------------------------+----------
  2016-07-31 00:00:00+00 |      329
@@ -931,7 +937,6 @@ Note the single quotes around `status = '404 NOT FOUND'`. I tried double quotes 
 
 The two steps above for counting total HTTP requests and errors separately took me ~2-3 hours over Sunday afternoon 20180128 and Monday morning 20180129.
 
-
 #### Combine the counts of total HTTP requests and HTTP 404 errors into a single table
 
 ##### Review
@@ -952,7 +957,7 @@ I need to join the two queries on date. This is a similar task to the [first que
 news=> select title, views from (select substr(path, 10), count(*) as views from log where path !='/' group by path) as hits, articles where substr = slug order by views desc limit 3;
 ```
 
-```
+```text
               title               | views
 ----------------------------------+--------
  Candidate is jerk, alleges rival | 338647
@@ -962,13 +967,12 @@ news=> select title, views from (select substr(path, 10), count(*) as views from
 
 ```
 
-
 ##### Planning
 
 I continued by drafting the task in plain English:
 
-* I want to see a table with three columns: the day, the total number of http requests, and the total number of error requests: `select day, http_requests, http_404`
-* I want to match the http requests and error requests columns based on the date: `where http_requests.date = http_404.date`
+- I want to see a table with three columns: the day, the total number of http requests, and the total number of error requests: `select day, http_requests, http_404`
+- I want to match the http requests and error requests columns based on the date: `where http_requests.date = http_404.date`
 
 It's not possible to combine both queries into a single `select` statement because `where` can be used only once. For example, the query below returns the three columns I want, but both columns display the error request count, because the entire statement is being filtered `where status = '404 NOT FOUND'`:
 
@@ -976,7 +980,7 @@ It's not possible to combine both queries into a single `select` statement becau
 select date_trunc('day', time) as date, count(*) as http_requests, count(*) as http_404 from log where status = '404 NOT FOUND' group by date order by date desc limit 5;
 ```
 
-```
+```text
           date          | http_requests | http_404
 ------------------------+---------------+----------
  2016-07-31 00:00:00+00 |           329 |      329
@@ -986,7 +990,6 @@ select date_trunc('day', time) as date, count(*) as http_requests, count(*) as h
  2016-07-27 00:00:00+00 |           367 |      367
 (5 rows)
 ```
-
 
 ##### Execution
 
@@ -1008,7 +1011,7 @@ where requests.date = errors.date
 order by requests.date desc;
 ```
 
-```
+```text
           date          | http_requests | http_404
 ------------------------+---------------+----------
  2016-07-31 00:00:00+00 |         45845 |      329
@@ -1047,21 +1050,20 @@ order by requests.date desc;
 
 **Awesome!**
 
-
 #### Identify days on which more than one percent of requests were errors
 
-Now I basically need to add in another calculation, probably something like `having http_404 > 0.01 * http_requests`. I tried `having` but it was easier to just add `and` to the `where` restriction instead.
+Now I basically need to add in another calculation, probably something like `having http_404 > 0.01 - http_requests`. I tried `having` but it was easier to just add `and` to the `where` restriction instead.
 
 ```sql
 select requests.date, http_requests, http_404 from
 (select date_trunc('day', time) as date, count(*) as http_requests from log group by date) as requests,
 (select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date) as errors
 where requests.date = errors.date
-and errors.http_404 > 0.01 * requests.http_requests
+and errors.http_404 > 0.01 - requests.http_requests
 order by requests.date desc;
 ```
 
-```
+```text
           date          | http_requests | http_404
 ------------------------+---------------+----------
  2016-07-17 00:00:00+00 |         55907 |     1265
@@ -1070,7 +1072,6 @@ order by requests.date desc;
 
 YES! The query shows one day, July 17, on which more than 1% of queries led to errors.
 
-
 #### Display the error percentage
 
 I tried going a bit further to show the error percentage as a column.
@@ -1078,7 +1079,7 @@ I tried going a bit further to show the error percentage as a column.
 I figured it would be something like:
 
 ```sql
-select errors.http_404 / requests.http_requests * 100 as error_percentage
+select errors.http_404 / requests.http_requests - 100 as error_percentage
 ```
 
 It was difficult, because the `http_requests` and `http_404` columns are being created in this query.
@@ -1089,24 +1090,24 @@ This runs and displays the `error_percentage` column, but doesn't correctly calc
 
 ```sql
 select requests_and_errors.date, http_requests, http_404, (http_404 / http_requests *100) as error_percentage from
-	(select requests.date, http_requests, http_404 from
-	(select date_trunc('day', time) as date, count(*) as http_requests from log group by date) as requests,
-	(select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date) as errors
-	where requests.date = errors.date
-	order by requests.date desc) as requests_and_errors;
+  (select requests.date, http_requests, http_404 from
+  (select date_trunc('day', time) as date, count(*) as http_requests from log group by date) as requests,
+  (select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date) as errors
+  where requests.date = errors.date
+  order by requests.date desc) as requests_and_errors;
 ```
 
 I tried nesting the query even further, unsuccessfully:
 
 ```sql
 select requests_and_errors.date, http_requests, http_404, error_percentage from
-	(select http_404 / http_requests * 100 as error_percentage from requests_and_errors) as percentage
-		(select requests.date, http_requests, http_404 from
-			(select date_trunc('day', time) as date, count(*) as http_requests from log group by date) as requests,
-			(select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date) as errors
-			where requests.date = errors.date
-			order by requests.date desc)
-		as requests_and_errors,
+  (select http_404 / http_requests - 100 as error_percentage from requests_and_errors) as percentage
+    (select requests.date, http_requests, http_404 from
+      (select date_trunc('day', time) as date, count(*) as http_requests from log group by date) as requests,
+      (select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date) as errors
+      where requests.date = errors.date
+      order by requests.date desc)
+    as requests_and_errors,
 group by requests_and_errors.date desc;
 ```
 
@@ -1122,7 +1123,6 @@ select date_trunc('day', time) as date, count(status = '404 NOT FOUND') from log
 ```
 
 The `count` returned is just the total number of requests though.
-
 
 #### Add the third SQL query to the Python code
 
@@ -1144,7 +1144,7 @@ I worked on [cleaning up the output](https://stackoverflow.com/questions/1059800
 vagrant@vagrant:/vagrant/logs$ python -c 'import logs; logs.popular_articles(), logs.popular_authors(), logs.errors()'
 ```
 
-```
+```text
 Query 1
 ('Candidate is jerk, alleges rival', 338647L)
 ('Bears love berries, alleges bear', 253801L)
@@ -1169,7 +1169,7 @@ I was finally able to remove the timestamp from the date by converting it to a s
         # Convert datetime to string and slice to retain only the date
         print('Date:', str(table[0])[:10])
         # Calculate error rate
-        print('Percent errors:', float(table[2]) / float(table[1]) * 100)
+        print('Percent errors:', float(table[2]) / float(table[1]) - 100)
 ```
 
 Next, I simply changed the Linux command (just by guessing) from `python` to `python3`, to specify. The output was formatted correctly. Maybe my shebang line isn't working, though it's written correctly, or maybe this distribution of Linux ignores the shebang line.
@@ -1180,7 +1180,7 @@ Here's the final Linux command:
 vagrant@vagrant:/vagrant/logs$ python3 -c 'import logs; logs.popular_articles(), logs.popular_authors(), logs.errors()'
 ```
 
-```
+```text
  Query 1: Most popular three articles
 Candidate is jerk, alleges rival 338647
 Bears love berries, alleges bear 253801
@@ -1199,4 +1199,4 @@ Percent errors: 2.2626862468027262
 
 **Done!**
 
-[(Back to TOC)](#toc)
+[(Back to TOC)](#table-of-contents)
