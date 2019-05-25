@@ -1,22 +1,19 @@
-# Computational narrative
+# SQL database logs analysis project computational narrative
 
 <a href="https://www.udacity.com/">
-    <img src="https://s3-us-west-1.amazonaws.com/udacity-content/rebrand/svg/logo.min.svg" width="300" alt="Udacity logo svg">
+  <img src="https://s3-us-west-1.amazonaws.com/udacity-content/rebrand/svg/logo.min.svg" width="300" alt="Udacity logo">
 </a>
 
-Udacity Full Stack Web Developer Nanodegree program
+[Udacity Full Stack Developer Nanodegree program](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004)
 
-Project 3. SQL database logs analysis
+Brendon Smith ([br3ndonland](https://github.com/br3ndonland))
 
-Brendon Smith
+[![code license](https://img.shields.io/badge/code%20license-MIT-blue.svg?longCache=true&style=for-the-badge)](https://choosealicense.com/licenses/mit/)
 
-br3ndonland
+## Table of Contents <!-- omit in toc -->
 
-## Table of Contents
-
-- [Table of Contents](#table-of-contents)
 - [Setup](#setup)
-- [Starting Python in *logs.py*](#starting-python-in-logspy)
+- [Starting Python in `logs.py`](#starting-python-in-logspy)
 - [Starting the virtual machine and exploring the data](#starting-the-virtual-machine-and-exploring-the-data)
 - [A tale of three queries](#a-tale-of-three-queries)
   - [1. Most popular articles](#1-most-popular-articles)
@@ -25,15 +22,15 @@ br3ndonland
 
 ## Setup
 
-- I read through the Udacity documentation and rubric (see *[logs-udacity.md](logs-udacity.md)*)
+- I read through the Udacity documentation and rubric (see _[logs-udacity.md](logs-udacity.md)_)
 - I kept vagrant and the database in a separate directory because of the large size of the database file.
 
-## Starting Python in *logs.py*
+## Starting Python in `logs.py`
 
 - Shebang: when reading through the "Functionality" section of the rubric, I saw that it recommended "a correct shebang line to indicate the Python version." I actually hadn't written a shebang line before, but looked it up on [Stack Overflow](https://stackoverflow.com/questions/2429511/why-do-people-write-usr-bin-env-python-on-the-first-line-of-a-python-script) and drafted one.
-- I created an outline in the python file *logs.py- with the steps I would be working on. Here's the initial outline:
+- I created an outline in the python file `logs.py` with the steps I would be working on. Here's the initial outline:
 
-  ```python
+  ```py
   #!/usr/bin/env python3
 
   # Udacity database logs analysis project
@@ -46,109 +43,111 @@ br3ndonland
 
   ```
 
-- *To function or not to function:- Next, I decided to write each of the three queries as a Python function. I began building the functions based on the resources from *Lesson 03. Python DB-API*:
-  - *forumdb.py*
-  - *3.3. Writing Code with DB API*
-  - *3.16. Reference — Python DB-API*
+_To function or not to function:_ Next, I decided to write each of the three queries as a Python function. I began building the functions based on the resources from _Lesson 03. Python DB-API_:
 
-  ```python
-  #!/usr/bin/env python3
+- `forumdb.py`
+- _3.3. Writing Code with DB API_
+- _3.16. Reference — Python DB-API_
 
-  # Udacity database logs analysis project
+```py
+#!/usr/bin/env python3
 
-  # Import the psycopg2 module to work with PostgreSQL
-  import psycopg2
+# Udacity database logs analysis project
 
-  # Store the database name as an object for easy reference in functions
-  DBNAME = "news"
+# Import the psycopg2 module to work with PostgreSQL
+import psycopg2
 
-
-  # 1. Most popular three articles
-  def popular_articles():
-      """Returns a sorted list of the three most highly accessed articles,
-      with the top article first.
-      """
-      # Connect to database
-      db = psycopg2.connect(database=DBNAME)
-      # Create a cursor object to run queries and scan through results
-      c = db.cursor()
-      # Execute the SQL query using the cursor
-      c.execute()
-      # Fetch all results from the cursor object
-      articles = c.fetchall()
-      print(articles)
-      # Close connection
-      db.close()
-      pass
+# Store the database name as an object for easy reference in functions
+DBNAME = "news"
 
 
-  # 2. Most popular authors
-  def popular_authors():
-      """Returns a sorted list of the most popular article authors,
-      with the most popular author at the top.
-      """
-      # Connect to database
-      db = psycopg2.connect(database=DBNAME)
-      # Create a cursor object to run queries and scan through results
-      c = db.cursor()
-      # Execute the SQL query using the cursor
-      c.execute()
-      # Fetch all results from the cursor object
-      authors = c.fetchall()
-      print(authors)
-      # Close connection
-      db.close()
-      pass
+# 1. Most popular three articles
+def popular_articles():
+    """Returns a sorted list of the three most highly accessed articles,
+    with the top article first.
+    """
+    # Connect to database
+    db = psycopg2.connect(database=DBNAME)
+    # Create a cursor object to run queries and scan through results
+    c = db.cursor()
+    # Execute the SQL query using the cursor
+    c.execute()
+    # Fetch all results from the cursor object
+    articles = c.fetchall()
+    print(articles)
+    # Close connection
+    db.close()
+    pass
 
 
-  # 3. Days on which >1% of HTTP requests led to errors
-  def errors():
-      """Returns a list of days on which >1% of HTTP requests resulted in
-      HTTP error codes.
-      """
-      # Connect to database
-      db = psycopg2.connect(database=DBNAME)
-      # Create a cursor object to run queries and scan through results
-      c = db.cursor()
-      # Execute the SQL query using the cursor
-      c.execute()
-      # Fetch all results from the cursor object
-      errors = c.fetchall()
-      print(errors)
-      # Close connection
-      db.close()
-      pass
+# 2. Most popular authors
+def popular_authors():
+    """Returns a sorted list of the most popular article authors,
+    with the most popular author at the top.
+    """
+    # Connect to database
+    db = psycopg2.connect(database=DBNAME)
+    # Create a cursor object to run queries and scan through results
+    c = db.cursor()
+    # Execute the SQL query using the cursor
+    c.execute()
+    # Fetch all results from the cursor object
+    authors = c.fetchall()
+    print(authors)
+    # Close connection
+    db.close()
+    pass
 
-  ```
 
-- Git commit at this point: "Initialize files and code outline"
+# 3. Days on which >1% of HTTP requests led to errors
+def errors():
+    """Returns a list of days on which >1% of HTTP requests resulted in
+    HTTP error codes.
+    """
+    # Connect to database
+    db = psycopg2.connect(database=DBNAME)
+    # Create a cursor object to run queries and scan through results
+    c = db.cursor()
+    # Execute the SQL query using the cursor
+    c.execute()
+    # Fetch all results from the cursor object
+    errors = c.fetchall()
+    print(errors)
+    # Close connection
+    db.close()
+    pass
+
+```
+
+Git commit at this point: "Initialize files and code outline"
 
 [(Back to TOC)](#table-of-contents)
 
 ## Starting the virtual machine and exploring the data
 
-- I already had vagrant installed from the instructions in *Lesson 2.17. Installing the Virtual Machine*.
+- I already had vagrant installed from the instructions in _Lesson 2.17. Installing the Virtual Machine_.
 - I unzipped *newsdata.sql- and moved it into the *vagrant- directory.
 - I changed into the vagrant directory and started up vagrant (only necessary when restarting computer):
 
-  ```bash
-  $ vagrant up
-  ```
+```sh
+$ vagrant up
+```
 
 - I then logged in to Ubuntu as before
 
-  ```bash
+  ```sh
   $ vagrant ssh
   ```
 
 - I connected to the database and loaded the data with PostgreSQL:
 
-  ```bash
+  ```sh
   $ cd /vagrant
   /vagrant$ psql -d news -f newsdata.sql
   ```
 
-  As explained in the Udacity documentation for the project (see *logs-udacity.md*):
+  As explained in the Udacity documentation for the project (see [logs-udacity.md](logs-udacity.md)):
+
   > Here's what this command does:
   >
   > - `psql` — the PostgreSQL command line program
@@ -159,14 +158,14 @@ br3ndonland
 
   This only needs to be done once. When reconnecting, after `vagrant up` and `vagrant ssh`, simply use
 
-  ```bash
+  ```sh
   $ cd /vagrant
   /vagrant$ psql -d news
   ```
 
   and to log out (the opposite of `vagrant ssh`), just type ctrl+d or
 
-  ```bash
+  ```sh
   $ logout
   ```
 
@@ -210,9 +209,9 @@ br3ndonland
 
 Helpful reference info when building the SQL queries:
 
-- *2.18. Reference — Elements of SQL*
-- *3.16. Reference — Python DB-API*
-- *4.15. Reference — Deeper into SQL*
+- _2.18. Reference — Elements of SQL_
+- _3.16. Reference — Python DB-API_
+- _4.15. Reference — Deeper into SQL_
 
 I broke each query down, as recommended in the [Udacity instructions](https://github.com/br3ndonland/udacity-fsnd03-p01-logs/blob/master/logs-udacity.md#q-these-queries-are-complicated-where-do-i-start), and repeatedly iterated until I got it.
 
@@ -220,11 +219,11 @@ I broke each query down, as recommended in the [Udacity instructions](https://gi
 
 ### 1. Most popular articles
 
-*What are the most popular three articles of all time?*
+_What are the most popular three articles of all time?_
 
 #### Use the `log` table to count hits by `path`
 
-I started by figuring out how to aggregate `path` and count hits in the `log` table. I based my first successful query on *1.11. Quiz: Count All the Species*.
+I started by figuring out how to aggregate `path` and count hits in the `log` table. I based my first successful query on _1.11. Quiz: Count All the Species_.
 
 ```sql
 news=> select path, count(*) as num from log group by path order by num desc;
@@ -436,9 +435,9 @@ This also showed me that the order of columns in the `SELECT` statement doesn't 
 
 #### Add the first SQL query to the Python code
 
-I plugged this into the Python code in *logs.py- to test it out. I reformatted the SQL query for Python with help from the [psycopg2](http://initd.org/psycopg/docs/usage.html#passing-parameters-to-sql-queries) docs:
+I plugged this into the Python code in `logs.py` to test it out. I reformatted the SQL query for Python with help from the [psycopg2](http://initd.org/psycopg/docs/usage.html#passing-parameters-to-sql-queries) docs:
 
-```python
+```py
 # 1. Most popular three articles
 def popular_articles():
     """Returns a sorted list of the three most highly accessed articles,
@@ -463,11 +462,11 @@ def popular_articles():
 
 ```
 
-In order to run the Python code within Vagrant, I created a */vagrant/logs- directory and copied in the *logs.py- file.
+In order to run the Python code within Vagrant, I created a _vagrant/logs_ directory and copied in the `logs.py` file.
 
 I then formatted the Linux command line argument to call the function, with a little help from [Stack Overflow](https://stackoverflow.com/questions/3987041/python-run-function-from-the-command-line#3987113) via a [DuckDuckGo](https://duckduckgo.com) search for "run python functions from command line":
 
-```bash
+```sh
 vagrant@vagrant:/vagrant/logs$ python -c 'import logs; print(logs.popular_articles())'
 ```
 
@@ -483,7 +482,7 @@ I tried a few different things. There is a `PrettyTable` module, but the Python 
 
 ### 2. Most popular authors
 
-*Who are the most popular article authors of all time?*
+_Who are the most popular article authors of all time?_
 
 The second query is like an extension of the first, with an additional join to the authors table, and an aggregation to group the articles by author.
 
@@ -549,7 +548,7 @@ The second query, up to this point, only took me a few iterations over maybe an 
 
 #### Aggregate article views by author
 
-*Aggregation aggravation:* This step was more difficult. I tried creating views, but wasn't able to create a view and select from that view in the same SQL query (remember each of the three queries has to be a self-contained query).
+_Aggregation aggravation:_ This step was more difficult. I tried creating views, but wasn't able to create a view and select from that view in the same SQL query (remember each of the three queries has to be a self-contained query).
 
 I started moving in the right direction by nesting the entire subquery from the "Join the three tables" step above inside another query:
 
@@ -604,7 +603,7 @@ select name, sum(views) as total_views from
 
 #### Add the second SQL query to the Python code
 
-```python
+```py
 # 2. Most popular authors
 def popular_authors():
     """Returns a sorted list of the most popular article authors,
@@ -634,7 +633,7 @@ def popular_authors():
 
 I copied the updated code into the vagrant directory as before, then ran the code from the Linux command line:
 
-```bash
+```sh
 vagrant@vagrant:/vagrant/logs$ python -c 'import logs; print(logs.popular_articles(), logs.popular_authors())'
 ```
 
@@ -650,7 +649,7 @@ Git commit at this point:
 
 ### 3. HTTP request error rate
 
-*On which days did more than one percent of requests lead to errors?*
+_On which days did more than one percent of requests lead to errors?_
 
 I need to sum the total number of HTTP requests, and divide by the number of HTTP `404` error codes.
 
@@ -799,7 +798,7 @@ news=> select date, status, http_requests from log,
 
 In a separate terminal window:
 
-```bash
+```sh
 $ vagrant ssh
 vagrant@vagrant:~$ top
 ```
@@ -833,12 +832,12 @@ KiB Swap:  1048572 total,  1048572 free,        0 used.   798024 avail Mem
 
 I actually couldn't kill the process.
 
-```bash
+```sh
 vagrant@vagrant:~$ kill -9 1508
 ```
 
 ```text
--bash: kill: (1508) - Operation not permitted
+-sh: kill: (1508) - Operation not permitted
 ```
 
 Typing `logout` doesn't do anything, because I don't have a command prompt. Quitting my terminal program (iTerm2) reveals a process still running in VirtualBox. I sent an ACPI shutdown signal through the GUI (can also be done on command line with `VBoxManage controlvm Ubuntu acpipowerbutton`).
@@ -951,7 +950,7 @@ select date_trunc('day', time) as date, count(*) as http_requests from log group
 select date_trunc('day', time) as date, count(*) as http_404 from log where status = '404 NOT FOUND' group by date order by date desc;
 ```
 
-I need to join the two queries on date. This is a similar task to the [first query](#1-what-are-the-most-popular-three-articles-of-all-time), where I joined the `log` and `articles` table based on the `slug` in the URL:
+I need to join the two queries on date. This is a similar task to the [first query](#1-most-popular-articles), where I joined the `log` and `articles` table based on the `slug` in the URL:
 
 ```sql
 news=> select title, views from (select substr(path, 10), count(*) as views from log where path !='/' group by path) as hits, articles where substr = slug order by views desc limit 3;
@@ -995,7 +994,7 @@ select date_trunc('day', time) as date, count(*) as http_requests, count(*) as h
 
 This task will require subqueries.
 
-I had to repeatedly iterate at this step for about 3 hours. It wasn't too difficult to split the task out into subqueries, but I was throwing errors regarding the aggregation, like `ERROR:  column "log.time" must appear in the GROUP BY clause or be used in an aggregate function`.
+I had to repeatedly iterate at this step for about 3 hours. It wasn't too difficult to split the task out into subqueries, but I was throwing errors regarding the aggregation, like `ERROR: column "log.time" must appear in the GROUP BY clause or be used in an aggregate function`.
 The two keys were:
 
 1. Establishing the proper join condition `where requests.date = errors.date`
@@ -1070,7 +1069,7 @@ order by requests.date desc;
 (1 row)
 ```
 
-YES! The query shows one day, July 17, on which more than 1% of queries led to errors.
+**YES!** The query shows one day, July 17, on which more than 1% of queries led to errors.
 
 #### Display the error percentage
 
@@ -1130,7 +1129,7 @@ Eventually, I just decided to calculate the percentage in Python. I already need
 
 I worked on [cleaning up the output](https://stackoverflow.com/questions/10598002/how-do-i-get-tables-in-postgres-using-psycopg2):
 
-```python
+```py
     # Fetch all results from the cursor object
     print("Query 1")
     for table in c.fetchall():
@@ -1140,7 +1139,7 @@ I worked on [cleaning up the output](https://stackoverflow.com/questions/1059800
     pass
 ```
 
-```bash
+```sh
 vagrant@vagrant:/vagrant/logs$ python -c 'import logs; logs.popular_articles(), logs.popular_authors(), logs.errors()'
 ```
 
@@ -1162,7 +1161,7 @@ Still not great, especially for query 3.
 
 I was finally able to remove the timestamp from the date by converting it to a string, and slicing for characters 0-10, with `print("Date:", str(table[0])[:10])`. I also improved the output formatting by including a header line.
 
-```python
+```py
     # Fetch all results from the cursor object
     print('\n', 'Query 3: Days on which >1% HTTP requests returned 404 errors')
     for table in c.fetchall():
@@ -1176,7 +1175,7 @@ Next, I simply changed the Linux command (just by guessing) from `python` to `py
 
 Here's the final Linux command:
 
-```bash
+```sh
 vagrant@vagrant:/vagrant/logs$ python3 -c 'import logs; logs.popular_articles(), logs.popular_authors(), logs.errors()'
 ```
 
