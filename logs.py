@@ -42,7 +42,6 @@ def popular_articles():
     print("\n", "Query 1: Most popular three articles")
     for title, num in result:
         print("    {}  --  {} views".format(title, num))
-    pass
 
 
 def popular_authors():
@@ -66,7 +65,6 @@ def popular_authors():
     print("\n", "Query 2: Most popular authors")
     for name, total_views in result:
         print("    {}  --  {} views".format(name, total_views))
-    pass
 
 
 def errors():
@@ -94,7 +92,6 @@ def errors():
     print("\n", "Query 3: Days on which >1% HTTP requests returned 404 errors")
     for errdate, http_requests, http_404, errpct in result:
         print("    {:%B %d, %Y}  --  {:.2f}% errors".format(errdate, errpct))
-    pass
 
 
 if __name__ == "__main__":
