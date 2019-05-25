@@ -126,7 +126,7 @@ Git commit at this point: "Initialize files and code outline"
 ## Starting the virtual machine and exploring the data
 
 - I already had vagrant installed from the instructions in _Lesson 2.17. Installing the Virtual Machine_.
-- I unzipped *newsdata.sql- and moved it into the *vagrant- directory.
+- I unzipped _newsdata.sql_ and moved it into the \*vagrant- directory.
 - I changed into the vagrant directory and started up vagrant (only necessary when restarting computer):
 
 ```sh
