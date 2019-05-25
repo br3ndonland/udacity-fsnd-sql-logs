@@ -1,6 +1,5 @@
-
-# Created by https://www.gitignore.io/api/macos,python,visualstudiocode
-# Edit at https://www.gitignore.io/?templates=macos,python,visualstudiocode
+# Created by https://www.gitignore.io/api/macos,python,vagrant,visualstudiocode
+# Edit at https://www.gitignore.io/?templates=macos,python,vagrant,visualstudiocode
 
 ### macOS ###
 # General
@@ -155,6 +154,16 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+### Vagrant ###
+# General
+.vagrant/
+
+# Log files (if you are creating logs in debug mode, uncomment this)
+# *.logs
+
+### Vagrant Patch ###
+*.box
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -166,8 +175,8 @@ dmypy.json
 # Ignore all local history of files
 .history
 
-# End of https://www.gitignore.io/api/macos,python,visualstudiocode
+# End of https://www.gitignore.io/api/macos,python,vagrant,visualstudiocode
 
-# br3ndonland additions
+### br3ndonland additions ###
 data
 *.html
