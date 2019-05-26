@@ -59,8 +59,8 @@ The application can be run by setting up either a virtual environment or a virtu
 
 ```sh
 ~
-❯ cd /path/where/you/want/repo
-~/path/where/you/want/repo
+❯ cd /path/to/repo
+~/path/to/repo
 ❯ git clone git@github.com:br3ndonland/udacity-fsnd-sql-logs.git
 ```
 
@@ -138,8 +138,7 @@ Major dependencies:
   ❯ git commit
   ~/path/to/repo
   ❯ git lfs ls-files
-  SHA * examples/DICOM.zip
-  SHA * examples/dicom.dcm
+  SHA * data/newsdata.zip
   ~/path/to/repo
   ❯ git push
   # Should see something like "Uploading LFS objects"
@@ -323,16 +322,16 @@ A virtual machine can be used to run the code from an operating system with a de
 
   ```sh
   ~
-  ❯ cd /path/where/you/want/repo
-  ~/path/where/you/want/repo
+  ❯ cd /path/to/repo
+  ~/path/to/repo
   ❯ git clone git@github.com:udacity/fullstack-nanodegree-vm.git
-  ~/path/where/you/want/repo
+  ~/path/to/repo
   ❯ cd fullstack-nanodegree-vm/vagrant
-  ~/path/where/you/want/repo/fullstack-nanodegree-vm/vagrant
+  ~/path/to/repo/fullstack-nanodegree-vm/vagrant
   ❯ git clone git@github.com:br3ndonland/udacity-fsnd-sql-logs.git
-  ~/path/where/you/want/repo/fullstack-nanodegree-vm/vagrant
+  ~/path/to/repo/fullstack-nanodegree-vm/vagrant
   ❯ vagrant up
-  ~/path/where/you/want/repo/fullstack-nanodegree-vm/vagrant
+  ~/path/to/repo/fullstack-nanodegree-vm/vagrant
   ❯ vagrant ssh
   ❯ vagrant@vagrant:~$ cd /vagrant/udacity-fsnd-sql-logs
   vagrant@vagrant:/vagrant/logs$ python3 logs.py
@@ -407,7 +406,7 @@ _On which days did more than 1% of requests lead to errors?_
 
 Returns a list of days on which >1% of HTTP requests resulted in HTTP error codes.
 
-[Query](sql/3-http-request-error-rate.sql)
+[Query](sql/3-http-request-error-rate.sql):
 
 ```sql
 select errdate, http_requests, http_404,
