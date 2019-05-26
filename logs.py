@@ -39,9 +39,9 @@ def popular_articles():
         as hits, articles where substr = slug order by num desc limit 3;
         """
     result = get_query_results(query)
-    print("\n", "Query 1: Most popular three articles")
+    print("\nQuery 1: Most popular three articles")
     for title, num in result:
-        print("    {}  --  {} views".format(title, num))
+        print(f"    {title}  --  {num} views")
 
 
 def popular_authors():
@@ -62,9 +62,9 @@ def popular_authors():
             as threetables group by name order by total_views desc;
         """
     result = get_query_results(query)
-    print("\n", "Query 2: Most popular authors")
+    print("\nQuery 2: Most popular authors")
     for name, total_views in result:
-        print("    {}  --  {} views".format(name, total_views))
+        print(f"    {name}  --  {total_views} views")
 
 
 def errors():
@@ -89,9 +89,9 @@ def errors():
         order by errdate desc;
         """
     result = get_query_results(query)
-    print("\n", "Query 3: Days on which >1% HTTP requests returned 404 errors")
+    print("\nQuery 3: Days on which >1% HTTP requests returned 404 errors")
     for errdate, http_requests, http_404, errpct in result:
-        print("    {:%B %d, %Y}  --  {:.2f}% errors".format(errdate, errpct))
+        print(f"    {errdate:%B %d, %Y}  --  {errpct:.2f}% errors")
 
 
 if __name__ == "__main__":
