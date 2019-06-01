@@ -168,7 +168,7 @@ user=# \q
 ~
 ❯ cd /path/to/repo
 ~/path/to/repo
-❯ psql -d news -f data/newsdata.sql
+❯ psql -d news -f db/data/newsdata.sql
 ```
 
 #### Run queries
@@ -218,7 +218,7 @@ udacity-fsnd-sql-logs-hash ❯ python logs.py
 - To install Docker tools locally:
   - Ubuntu Linux: follow the [instructions for Ubuntu Linux](https://docs.docker.com/install/linux/docker-ce/ubuntu/), making sure to follow the [postinstallation steps](https://docs.docker.com/install/linux/linux-postinstall/) to activate the Docker daemon.
   - macOS and Windows: install [Docker Desktop](https://www.docker.com/products/docker-desktop) (available via [Homebrew](https://brew.sh) with `brew cask install docker`).
-- To build this Docker image and run the container:
+- To build a Docker image and run the container:
 
   ```sh
   cd path/to/repo

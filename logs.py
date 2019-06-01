@@ -3,42 +3,39 @@ SQL database logs analysis project
 Udacity Full Stack Developer Nanodegree program
 Brendon Smith https://github.com/br3ndonland/udacity-fsnd-sql-logs
 """
+import os
+import records
 
-import psycopg2
 
-
-def get_query_results(query):
-    """Helper function for code shared among the three SQL queries.
+def query_result(query, is_file=False):
+    """Helper function used to execute SQL queries.
     ---
     - Connect to database
-    - Create a cursor object to run queries and scan results
-    - Execute SQL query using cursor
-    - Fetch all results from cursor object
-    - Save as results object
-    - Close connection
+    - Read SQL query
+    - Execute SQL query with Records
+    - Save result as object and return
     """
-    db = psycopg2.connect(database="news")
-    c = db.cursor()
-    c.execute(query)
-    result = c.fetchall()
-    db.close()
+    if os.environ.get("DATABASE_URL"):
+        db_uri = os.environ.get("DATABASE_URL")
+    else:
+        db_uri = "postgresql://vagrant@localhost/news"
+    db = records.Database(db_uri)
+    if is_file is True:
+        result = db.query_file(query)
+    else:
+        result = db.query(query)
     return result
 
 
 def popular_articles():
     """1. Most popular three articles
     ---
-    - Save SQL query as object
+    - Input path to SQL query
     - Execute SQL query using helper function
     - Print results, with top article first
     """
-    query = """
-        select title, num from
-            (select substr(path, 10), count(*) as num from log
-            where path !='/' group by path)
-        as hits, articles where substr = slug order by num desc limit 3;
-        """
-    result = get_query_results(query)
+    query = "sql/1-most-popular-articles.sql"
+    result = query_result(query, is_file=True)
     print("\nQuery 1: Most popular three articles")
     for title, num in result:
         print(f"    {title}  --  {num} views")
@@ -47,21 +44,12 @@ def popular_articles():
 def popular_authors():
     """2. Most popular authors
     ---
-    - Save SQL query as object
+    - Input path to SQL query
     - Execute SQL query using helper function
     - Print a sorted list of the most popular article authors
     """
-    query = """
-        select name, sum(views) as total_views from
-            (select name, author, title, views from
-                (select substr(path, 10), count(*) as views from log
-                    where path !='/' group by path)
-                as hits, articles, authors
-                where substr = slug and author = authors.id
-                order by views desc)
-            as threetables group by name order by total_views desc;
-        """
-    result = get_query_results(query)
+    query = "sql/2-most-popular-authors.sql"
+    result = query_result(query, is_file=True)
     print("\nQuery 2: Most popular authors")
     for name, total_views in result:
         print(f"    {name}  --  {total_views} views")
@@ -70,25 +58,12 @@ def popular_authors():
 def errors():
     """3. Days on which >1% of HTTP requests led to errors
     ---
-    - Save SQL query as object
+    - Input path to SQL query
     - Execute SQL query using helper function
     - Print days on which 1% or more HTTP requests returned errors
     """
-    query = """
-        select errdate, http_requests, http_404,
-        100.0 * http_404 / http_requests as errpct from
-            (select date_trunc('day', time) as reqdate, count(*)
-            as http_requests from log group by reqdate)
-            as requests,
-            (select date_trunc('day', time) as errdate, count(*)
-            as http_404 from log where status = '404 NOT FOUND'
-            group by errdate)
-            as errors
-        where reqdate = errdate
-        and errors.http_404 > 0.01 * requests.http_requests
-        order by errdate desc;
-        """
-    result = get_query_results(query)
+    query = "sql/3-http-request-error-rate.sql"
+    result = query_result(query, is_file=True)
     print("\nQuery 3: Days on which >1% HTTP requests returned 404 errors")
     for errdate, http_requests, http_404, errpct in result:
         print(f"    {errdate:%B %d, %Y}  --  {errpct:.2f}% errors")
