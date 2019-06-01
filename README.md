@@ -294,7 +294,7 @@ udacity-fsnd-sql-logs-hash ❯ python logs.py
 
 #### Docker Compose
 
-_TODO: coming soon!_
+_Coming soon!_ A preliminary Docker Compose file has been added, but the application is not fully functional within Docker yet.
 
 ### Run with Vagrant virtual machine
 

@@ -1,0 +1,10 @@
+version: "3"
+services:
+  db:
+    build: ./db
+  app:
+    build: .
+    volumes:
+      - .:/code
+    depends_on:
+      - db
