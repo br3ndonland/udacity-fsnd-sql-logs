@@ -304,26 +304,25 @@ A virtual machine can be used to run the code from an operating system with a de
 
 ##### Install dependencies
 
-- HashiCorp [Vagrant](https://www.vagrantup.com/) 2.0.4 with Ubuntu 16.04.4 LTS (GNU/Linux 4.4.0-75-generic x86_64)
+- HashiCorp [Vagrant](https://www.vagrantup.com/)
   - Software that provides an operating system in a defined configuration, allowing it to run identically across many personal computers.
-  - Would be possible if we added a
 - Vagrant and VirtualBox can be installed with Homebrew Cask:
 
   ```sh
-  brew cask install vagrant virtualbox
+  brew cask install vagrant
   ```
 
 ##### Install Vagrant configuration
 
 - Vagrant creates a virtual environment using a [provider](https://www.vagrantup.com/docs/providers/).
-  - Oracle VirtualBox is the most common provider used.
+  - Oracle VirtualBox is the most common provider used. It is also available as a Homebrew Cask.
   - [Docker can be used as a Vagrant provider](https://www.vagrantup.com/docs/docker/) instead of VirtualBox.
-- The provider normally installs the operating system using [boxes](https://www.vagrantup.com/docs/boxes.html). The Docker provider does not require a `config.vm.box` setting. Rather, it pulls an image from a container registry like Docker Hub. In this case, the [centos/python-36-centos7](https://hub.docker.com/r/centos/python-36-centos7) image is used.
+  - The provider normally installs the operating system using [boxes](https://www.vagrantup.com/docs/boxes.html). The Docker provider does not require a `config.vm.box` setting. Rather, it pulls an image from a container registry like Docker Hub.
 - Vagrant is configured with a _Vagrantfile_.
   - This project was originally completed with the [Udacity virtual machine configuration](https://github.com/udacity/fullstack-nanodegree-vm), a Git repository from Udacity that contains a _Vagrantfile_ to configure Vagrant. If using the Udacity configuration, note that some of the necessary Python modules in the Udacity virtual machine configuration are only included for Python 2, and not Python 3. If needed, install the modules with `pip`.
-  - A _Vagrantfile_ was later added directly to this repo, with a CentOS and Docker setup.
+  - A _Vagrantfile_ was later added directly to this repo, with Docker as a provider.
 - Vagrant reads the _Vagrantfile_, and uses the provider to run the virtual environment.
-- Install the Udacity Vagrant virtual machine using the instructions in [logs-udacity.md](info/logs-udacity.md). Summary:
+- Install the Udacity Vagrant virtual machine using the instructions in _[logs-udacity.md](info/logs-udacity.md)_. Summary:
 
   ```sh
   ~
