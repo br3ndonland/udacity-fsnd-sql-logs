@@ -154,7 +154,7 @@ Major dependencies:
 - Grant user access to database.
 - Load _newsdata.sql_ into database.
 
-```text
+```
 ~
 ❯ psql
 psql (11.3)
@@ -284,12 +284,12 @@ udacity-fsnd-sql-logs-hash ❯ python logs.py
   WORKDIR /app
   # Copy the directory to /app in the container
   COPY . /app
+  # Install psycopg2 PostgreSQL dependencies
+  RUN apk update; apk add build-base postgresql postgresql-dev libpq
   # Install Pipenv
   RUN python -m pip install pipenv
   # Install packages from Pipfile.lock, configured for Docker deployments
   RUN pipenv install --system --deploy --ignore-pipfile
-  # Run the application
-  CMD ["python", "logs.py"]
   ```
 
 #### Docker Compose
@@ -304,21 +304,26 @@ A virtual machine can be used to run the code from an operating system with a de
 
 ##### Install dependencies
 
-- Oracle [VirtualBox](https://www.virtualbox.org) Version 5.2.10 r122088 (Qt5.6.3)
-  - Software that runs special containers called virtual machines, like Vagrant.
 - HashiCorp [Vagrant](https://www.vagrantup.com/) 2.0.4 with Ubuntu 16.04.4 LTS (GNU/Linux 4.4.0-75-generic x86_64)
-  - Software that provides the Linux operating system in a defined configuration, allowing it to run identically across many personal computers. Linux can then be run as a virtual machine with VirtualBox.
+  - Software that provides an operating system in a defined configuration, allowing it to run identically across many personal computers.
+  - Would be possible if we added a
 - Vagrant and VirtualBox can be installed with Homebrew Cask:
 
   ```sh
   brew cask install vagrant virtualbox
   ```
 
-##### Install virtual machine configuration
+##### Install Vagrant configuration
 
-- The [Udacity virtual machine configuration](https://github.com/udacity/fullstack-nanodegree-vm) is a Git repository from Udacity that configures Vagrant.
-  - Some of the necessary Python modules in the Udacity virtual machine configuration are only included for Python 2, and not Python 3. If needed, install the modules with `pip`.
-- Install the Vagrant virtual machine using the instructions in [logs-udacity.md](info/logs-udacity.md). Summary:
+- Vagrant creates a virtual environment using a [provider](https://www.vagrantup.com/docs/providers/).
+  - Oracle VirtualBox is the most common provider used.
+  - [Docker can be used as a Vagrant provider](https://www.vagrantup.com/docs/docker/) instead of VirtualBox.
+- The provider normally installs the operating system using [boxes](https://www.vagrantup.com/docs/boxes.html). The Docker provider does not require a `config.vm.box` setting. Rather, it pulls an image from a container registry like Docker Hub. In this case, the [centos/python-36-centos7](https://hub.docker.com/r/centos/python-36-centos7) image is used.
+- Vagrant is configured with a _Vagrantfile_.
+  - This project was originally completed with the [Udacity virtual machine configuration](https://github.com/udacity/fullstack-nanodegree-vm), a Git repository from Udacity that contains a _Vagrantfile_ to configure Vagrant. If using the Udacity configuration, note that some of the necessary Python modules in the Udacity virtual machine configuration are only included for Python 2, and not Python 3. If needed, install the modules with `pip`.
+  - A _Vagrantfile_ was later added directly to this repo, with a CentOS and Docker setup.
+- Vagrant reads the _Vagrantfile_, and uses the provider to run the virtual environment.
+- Install the Udacity Vagrant virtual machine using the instructions in [logs-udacity.md](info/logs-udacity.md). Summary:
 
   ```sh
   ~
