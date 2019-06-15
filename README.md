@@ -38,14 +38,21 @@ I completed this project as part of the Udacity Full Stack Developer Nanodegree 
 ### Required files
 
 - _[logs.py](logs.py)_ - main program code
-- _[logs-output.txt](logs-output.txt)_ - example code output
+- _[logs-output.txt](info/logs-output.txt)_ - example code output
 - _[README.md](README.md)_ - this file, a concise description of the project
 
 ### Other files
 
-- _[logs-methods.md](info/logs-methods.md)_ - computational narrative explaining how I wrote the code for the project
-- _[logs-review.md](info/logs-review.md)_ - Udacity code review
-- _[logs-udacity.md](info/logs-udacity.md)_ - project description, installation instructions, and rubric from Udacity
+- _db/_ - files that set up the PostgreSQL database
+- _img/_ - images used in repository
+- _info/_ -
+  - _[logs-methods.md](info/logs-methods.md)_ - computational narrative explaining how I wrote the code for the project
+  - _[logs-review.md](info/logs-review.md)_ - Udacity code review
+  - _[logs-udacity.md](info/logs-udacity.md)_ - project description, installation instructions, and rubric from Udacity
+- _sql/_ - database queries in SQL format
+- _[docker-compose.yml](docker-compose.yml)_ and _[Dockerfile](Dockerfile)_ - files used by Docker to set up containers for the application.
+- _[Pipfile](Pipfile)_ and _[Pipfile.lock](Pipfile.lock)_ - files used by Pipenv to set up a Python virtual environment.
+- _[Vagrantfile](Vagrantfile)_ - file used to configure a Vagrant virtual environment.
 
 [(Back to TOC)](#table-of-contents)
 
