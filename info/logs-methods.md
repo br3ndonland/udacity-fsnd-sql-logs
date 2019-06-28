@@ -1095,6 +1095,20 @@ select requests_and_errors.date, http_requests, http_404, (http_404 / http_reque
   where requests.date = errors.date
   order by requests.date desc) as requests_and_errors;
 ```
+ـــــــــــ *
+ the correction of above query is to use (http_404::float / http_requests *100) as error_percentage
+it works with me in this query u can run it and see :D
+
+```sql
+select t_all_requests.date, all_requests, error_requests , ((error_requests::float/ all_requests)*100) as percentage_of_error  from
+(select date_trunc('day', time) as date, count(*) as all_requests from log
+group by date ) as t_all_requests ,
+(select date_trunc('day', time) as date, count(*) as error_requests from log
+where status = '404 NOT FOUND' group by date) as t_error_requests
+where t_all_requests.date = t_error_requests.date 
+order by t_all_requests.date desc;
+```
+ـــــــــــ *
 
 I tried nesting the query even further, unsuccessfully:
 
