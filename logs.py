@@ -20,11 +20,7 @@ def query_result(query, is_file=False):
     else:
         db_uri = "postgresql://vagrant@localhost/news"
     db = records.Database(db_uri)
-    if is_file is True:
-        result = db.query_file(query)
-    else:
-        result = db.query(query)
-    return result
+    return db.query_file(query) if is_file is True else db.query(query)
 
 
 def popular_articles():
