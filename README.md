@@ -76,16 +76,16 @@ The application can be run by setting up either a virtual environment or a virtu
 Install dependencies with a package manager of choice, such as [Homebrew](https://brew.sh/) on macOS.
 
 ```sh
-brew install python pipenv
-brew cask install postgres postico
+brew install python pipenv postgresql
+brew cask install postico
 ```
 
 Major dependencies:
 
 - [Python](https://www.python.org/)
 - [Pipenv](https://pipenv.readthedocs.io/)
-- [Postgres](https://postgresapp.com/)
-- [Postico](https://eggerapps.at/postico/) (optional): helpful GUI that can complement Postgres. Postico needs Postgres to connect to local databases.
+- PostgreSQL or the [Postgres app](https://postgresapp.com/)
+- [Postico](https://eggerapps.at/postico/) (optional): helpful GUI that can complement Postgres. Postico needs a Postgres server to connect to local databases.
 
 #### Install Pipenv virtual environment
 
@@ -110,7 +110,7 @@ Major dependencies:
 
 #### Set up database
 
-[Postgres](https://postgresapp.com/) should be installed as described above. [Postico](https://eggerapps.at/postico/) is a helpful GUI for PostgreSQL that can complement (but not replace) Postgres. Postico needs Postgres to connect to local databases.
+[Postgres](https://postgresapp.com/) should be installed as described above. [Postico](https://eggerapps.at/postico/) is a helpful GUI for PostgreSQL that can complement (but not replace) Postgres. Postico needs a Postgres server to connect to local databases.
 
 ##### Unzip news data
 
@@ -156,7 +156,10 @@ Major dependencies:
 ##### Create user and database
 
 - Enter PostgreSQL with `psql` on the command line.
-- Create `vagrant` user: _newsdata.sql_ is configured for a PostgreSQL user `vagrant`. When using the Vagrant virtual machine, this step is specified in the _Vagrantfile_ and performed during `vagrant up`.
+- Create `vagrant` user:
+  - _newsdata.sql_ is configured for a PostgreSQL user `vagrant`.
+  - Without Vagrant, you may need to run `createdb` before starting the `psql` CLI.
+  - When using the Vagrant virtual machine, this step is specified in the _Vagrantfile_ and performed during `vagrant up`.
 - Create `news` database.
 - Grant user access to database.
 - Load _newsdata.sql_ into database.
@@ -301,7 +304,7 @@ udacity-fsnd-sql-logs-hash ❯ python logs.py
 
 #### Docker Compose
 
-_Coming soon!_ A preliminary Docker Compose file has been added, but the application is not fully functional within Docker yet.
+_TODO._ A preliminary Docker Compose file has been added, but the application is not fully functional within Docker yet.
 
 ### Run with Vagrant virtual machine
 
