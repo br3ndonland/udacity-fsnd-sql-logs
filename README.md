@@ -43,7 +43,7 @@ I completed this project as part of the Udacity Full Stack Developer Nanodegree 
 
 ### Other files
 
-- _db/_ - files that set up the PostgreSQL database
+- _db/_ - files that set up the PostgreSQL database. Data can be downloaded from the [original source](https://d17h27t6h515a5.cloudfront.net/topher/2016/August/57b5f748_newsdata/newsdata.zip) or [my copy](https://drive.proton.me/urls/M35XBECQ3M#bEzi87FKyXcg).
 - _img/_ - images used in repository
 - _info/_ -
   - _[logs-methods.md](info/logs-methods.md)_ - computational narrative explaining how I wrote the code for the project
@@ -114,44 +114,7 @@ Major dependencies:
 
 ##### Unzip news data
 
-- Unzip _data/newsdata.zip_. If the file is not present, [download](https://d17h27t6h515a5.cloudfront.net/topher/2016/August/57b5f748_newsdata/newsdata.zip) and save in the _data/_ directory.
-- The zipped news database has been added to this repository with [Git LFS](https://git-lfs.github.com/). To work with Git LFS:
-
-  ```sh
-  # Install Git LFS on your system. For macOS:
-  ~
-  ❯ brew install git-lfs
-  ~
-  ❯ cd ~/path/to/repo
-  # Create .gitattributes and tell Git LFS what to track:
-  ~/path/to/repo
-  ❯ touch .gitattributes
-  ~/path/to/repo
-  ❯ git lfs track "*.zip"
-  Tracking "*.zip"
-  # Commit .gitattributes
-  ~/path/to/repo
-  ❯ git add .gitattributes
-  ~/path/to/repo
-  ❯ git commit -m "Initialize Git LFS"
-  # Initialize Git LFS, once per repo:
-  ~/path/to/repo
-  ❯ git lfs install
-  Updated git hooks.
-  Git LFS initialized.
-  ~/path/to/repo
-  ❯ git add --all
-  ~/path/to/repo
-  ❯ git commit
-  ~/path/to/repo
-  ❯ git lfs ls-files
-  SHA * data/newsdata.zip
-  ~/path/to/repo
-  ❯ git push
-  # Should see something like "Uploading LFS objects"
-  ```
-
-- It is important to verify that Git LFS is properly initialized before committing files to be tracked with LFS. It is very difficult to get files un-tracked by Git after they have been committed. If you get into this situation, you can try `git lfs migrate import`, as described in [this GitHub issue](https://github.com/git-lfs/git-lfs/issues/1939#issuecomment-353247795), but it might be easier to just locally [undo](https://github.blog/2015-06-08-how-to-undo-almost-anything-with-git/) and create a new branch.
+- Unzip _data/newsdata.zip_. If the file is not present, download from the [original source](https://d17h27t6h515a5.cloudfront.net/topher/2016/August/57b5f748_newsdata/newsdata.zip) or [my copy](https://drive.proton.me/urls/M35XBECQ3M#bEzi87FKyXcg) and save in the _data/_ directory.
 
 ##### Create user and database
 
